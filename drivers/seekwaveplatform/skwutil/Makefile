@@ -6,7 +6,7 @@
 #PWD := $(shell pwd)
 #CURFOLDER ?= $(pwd)
 #ccflags-y := -Idrivers/misc/seekwaveplatform/sdio \
-	-Idrivers/misc/seekwaveplatform/usb
+#	-Idrivers/misc/seekwaveplatform/usb
 
 ifeq ($(CONFIG_OF), y)
         ccflags-y := -DCONFIG_OF
