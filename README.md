@@ -11,3 +11,5 @@ KERNEL_SRC := $(HOME)/coreelec/CoreELEC/build.CoreELEC-Amlogic-no.aarch64-22/bui
 
 PATH should point to the coreelec clang toolchain (toolchain/lib/clang/bin)
 KERNEL_SRC should point to the coreelec kernel source (build.CoreELEC*/build/linux-*)
+
+Then run make modules_install to get two .ko modules in modules folder.
