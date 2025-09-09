@@ -223,10 +223,9 @@ static int ucom_release(struct inode *ip, struct file *fp)
 static ssize_t ucom_read(struct file *fp, char __user *buf, size_t count, loff_t *pos)
 {
 	struct ucom_dev *ucom = fp->private_data;
-	ssize_t r = count;
+	ssize_t r;
 	int ret;
 	unsigned long flags;
-	u32 *data;
 
 	if (cp_exception_sts || atomic_read(&ucom->open) == 0)
 		return -EIO;
@@ -241,7 +240,6 @@ static ssize_t ucom_read(struct file *fp, char __user *buf, size_t count, loff_t
 	spin_unlock_irqrestore(&ucom->lock, flags);
 	ret = ucom->pdata->hw_sdma_rx(ucom->portno, ucom->rx_buf, count);
 	ucom->rx_busy = 0;
-	data = (uint32_t *)ucom->rx_buf;
 
 	if (ret > 0) {
 		r = ret;
