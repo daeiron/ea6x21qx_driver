@@ -224,7 +224,8 @@ static inline void *skw_put_skb_data(struct sk_buff *skb, const void *data,
 {
 	void *tmp = skb_put(skb, len);
 
-	memcpy(tmp, data, len);
+	if (data && len > 0)
+		memcpy(tmp, data, len);
 
 	return tmp;
 }
