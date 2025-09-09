@@ -501,10 +501,11 @@ static int skw_ucom_remove(struct platform_device *pdev)
 	unsigned long  devno;
 
 	ucom = platform_get_drvdata(pdev);
-	if (!strncmp(ucom->pdata->port_name, "LOG", 3)) {
-		skw_modem_log_exit();
-	}
-	if (ucom) {
+	if (ucom && ucom->pdata) {
+		if (!strncmp(ucom->pdata->port_name, "LOG", 3)) {
+			skw_modem_log_exit();
+		}
+	
 		if (!strncmp(ucom->pdata->port_name, "BTCMD", 5)) {
 			if (ucom->rx_busy && ucom->pdata) {
 				ucom->pdata->close_port(ucom->portno);
