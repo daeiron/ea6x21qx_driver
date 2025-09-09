@@ -33,9 +33,6 @@ static int skw_dpd_ilc_download_gear_param(struct wiphy *wiphy,
 	int ret = 0;
 	int i;
 	struct skw_ilc_cali_param ilc_param;
-	struct skw_core *skw = NULL;
-
-	skw = wiphy_priv(wiphy);
 
 	for (i = 0; i < 64; i++) {
 		ilc_param.gear = gear;
