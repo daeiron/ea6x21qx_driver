@@ -59,7 +59,7 @@ static int skw_sdio_log_show(struct seq_file *seq, void *data)
 			break;
 	}
 
-	seq_printf(seq, "\nlog   level: %s\n", log_name[i]);
+	seq_printf(seq, "%s\n", log_name[i < 5 ? i : 4]);
 
 	seq_puts(seq, "\n");
 	seq_printf(seq, "port0 log: %s\n", SKW_SDIO_LOG_STATUS(SKW_SDIO_PORT0));
