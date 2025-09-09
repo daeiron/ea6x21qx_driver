@@ -158,7 +158,6 @@ void *skw_build_presp_frame(struct wiphy *wiphy, struct skw_iface *iface,
 
 	if (ie_len) {
 		memcpy(pos, ie, ie_len);
-		pos += ie_len;
 	}
 
 	return temp;
@@ -560,7 +559,7 @@ int skw_tlv_add(struct skw_tlv_conf *conf, int type, void *dat, int dat_len)
 	if (conf->total_len + dat_len + 4 > conf->buff_len)
 		return -ENOMEM;
 
-	tlv = (struct skw_tlv *)(conf->buff + conf->total_len);
+	tlv = (struct skw_tlv *)((u8 *)conf->buff + conf->total_len);
 	tlv->type = type;
 	tlv->len = dat_len;
 	memcpy(tlv->value, dat, dat_len);
@@ -595,7 +594,7 @@ void *skw_tlv_reserve(struct skw_tlv_conf *conf, int len)
 	if (conf->total_len + len > conf->buff_len)
 		return NULL;
 
-	start = conf->buff + conf->total_len;
+	start = (u8 *)conf->buff + conf->total_len;
 	conf->total_len += len;
 
 	return start;
