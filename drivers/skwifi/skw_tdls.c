@@ -52,6 +52,9 @@ static bool skw_id_in_list(const u8 *ids, int n_ids, u8 id, bool id_ext)
 {
 	int i = 0;
 
+	if (!ids || n_ids == 0)
+    	return -EINVAL;
+
 	/* Make sure array values are legal */
 	if (WARN_ON(ids[n_ids - 1] == SKW_WLAN_EID_EXTENSION))
 		return false;
