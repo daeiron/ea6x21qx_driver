@@ -1747,6 +1747,11 @@ static int __init skw_sdio_io_init(void)
 		return -ENOMEM;
 	}
 	skw_sdio->eof_buf = kzalloc(SKW_BUF_SIZE, GFP_KERNEL);
+	if(skw_sdio->eof_buf == NULL){
+		kfree(skw_sdio->next_size_buf);
+		kfree(skw_sdio);
+		return -ENOMEM;
+	}
 	atomic_set(&skw_sdio->online, SKW_SDIO_CARD_OFFLINE);
 	if(!bind_device){
 		skw_sdio->adma_rx_enable = 1;
