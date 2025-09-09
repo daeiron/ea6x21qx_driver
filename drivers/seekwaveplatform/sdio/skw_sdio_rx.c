@@ -1018,7 +1018,7 @@ static int skw_sdio_sdma_parser(char *data_buf, int total)
 {
 	struct skw_sdio_data_t *skw_sdio = skw_sdio_get_data();
 	struct skw_packet_header *header = NULL;
-	int channel;
+	int channel = 0;
 	u32 *data;
 	unsigned char *p = NULL;
 	unsigned int parse_len = 0;
@@ -1066,7 +1066,7 @@ static int skw_sdio2_sdma_parser(char *data_buf, int total)
 {
 	struct skw_sdio_data_t *skw_sdio = skw_sdio_get_data();
 	struct skw_packet2_header *header = NULL;
-	int channel;
+	int channel = 0;
 	u32 *data;
 	unsigned char *p = NULL;
 	unsigned int parse_len = 0;
