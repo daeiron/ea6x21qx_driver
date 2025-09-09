@@ -1929,7 +1929,7 @@ static int skw_get_station(struct wiphy *wiphy, struct net_device *dev,
 			get_sta_resp.filter_drop_offload_cnt,
 			sizeof(get_sta_resp.filter_drop_offload_cnt));
 
-		ctx->peer->refer.percent = get_sta_resp.tx_percent;
+		//ctx->peer->refer.percent = get_sta_resp.tx_percent; useless?
 		ctx->peer->refer.percent = get_sta_resp.rx_percent;
 
 		if (is_skw_ap_mode(iface)) {
@@ -3973,7 +3973,7 @@ static int skw_sched_scan_start(struct wiphy *wiphy, struct net_device *dev,
 		offset += n_ssids_len;
 	}
 
-	match_sets = (void *)params->data + offset;
+	match_sets = (struct skw_sched_match_sets *)((u8 *)params->data + offset);
 	for (i = 0; i < req->n_match_sets; i++) {
 		memcpy(match_sets[i].ssid, req->match_sets[i].ssid.ssid, 32);
 		match_sets[i].ssid_len = req->match_sets[i].ssid.ssid_len;
