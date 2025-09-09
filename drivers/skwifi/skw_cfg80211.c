@@ -2285,14 +2285,14 @@ static void skw_parse_center_chn(struct cfg80211_bss *bss, int *he_enable,
 	const u8 *he_ie;
 	struct skw_he_cap_elem *he_cap;
 
+	if (WARN_ON(!bss))
+		return;	
+
 	cc->bw = SKW_CHAN_WIDTH_20;
 	cc->center_chn1 = bss->channel->hw_value;
 	cc->center_chn2 = 0;
 
 	*he_enable = 1;
-
-	if (WARN_ON(!bss))
-		return;
 
 	rcu_read_lock();
 
@@ -3528,12 +3528,16 @@ int skw_mgmt_tx(struct wiphy *wiphy, struct skw_iface *iface,
 {
 	int ret, total_len;
 	struct skw_mgmt_tx_param *param;
-	const struct ieee80211_mgmt *mgmt = frame;
-	u64 tx_cookie = skw_tx_cookie();
-	u16 fc = SKW_MGMT_SFC(mgmt->frame_control);
+	u64 tx_cookie;
+	const struct ieee80211_mgmt *mgmt;
+	u16 fc;
 
 	if (!chan || !frame)
 		return -EINVAL;
+	
+	tx_cookie = skw_tx_cookie();
+	mgmt = frame;
+	fc = SKW_MGMT_SFC(mgmt->frame_control);
 
 	skw_dbg("%s: chan: %d, wait: %d, cookie: %lld, no_ack: %d, len: %d\n",
 		skw_mgmt_name(fc), chan->hw_value, wait, tx_cookie,
