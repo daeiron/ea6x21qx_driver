@@ -507,7 +507,7 @@ static int skw_ucom_remove(struct platform_device *pdev)
 		}
 	
 		if (!strncmp(ucom->pdata->port_name, "BTCMD", 5)) {
-			if (ucom->rx_busy && ucom->pdata) {
+			if (ucom->rx_busy) {
 				ucom->pdata->close_port(ucom->portno);
 			}
 			skw_bt_state_event_deinit(ucom);
