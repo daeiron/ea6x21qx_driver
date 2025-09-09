@@ -122,7 +122,6 @@ static inline struct skw_rx_desc *skw_rx_desc_hdr(struct sk_buff *skb)
 	return (struct skw_rx_desc *)(skb->data - SKW_SKB_RXCB(skb)->rx_desc_offset);
 }
 
-
 static void skw_tcpopt_window_handle(struct sk_buff *skb)
 {
 	unsigned int tcphoff, tcp_hdrlen, length;
@@ -133,21 +132,20 @@ static void skw_tcpopt_window_handle(struct sk_buff *skb)
 	struct iphdr *iph = (struct iphdr *)(skb->data);
 
 	if (eth->h_proto == htons(ETH_P_IP) && iph->protocol == IPPROTO_TCP) {
-
 		if (skb->len < ntohs(iph->tot_len))
-			return ;
+			return;
 
 		tcphoff = iph->ihl * 4;
 		tcph = (struct tcphdr *)(skb->data + tcphoff);
 
-		if (!(tcp_flag_word(tcph)&TCP_FLAG_SYN)) {
-			return ;
+		if (!(tcp_flag_word(tcph) & TCP_FLAG_SYN)) {
+			return;
 		}
 		//skw_dbg("skb->len:%d tot_len:%d\n", skb->len, ntohs(iph->tot_len));
 
-		tcp_hdrlen = tcph->doff*4;
-		length = (tcph->doff-5)*4;
-		ptr = (u8*)tcph + tcp_hdrlen - length;
+		tcp_hdrlen = tcph->doff * 4;
+		length = (tcph->doff - 5) * 4;
+		ptr = (u8 *)tcph + tcp_hdrlen - length;
 		while (length > 0) {
 			int opcode = *ptr++;
 			int opsize;
@@ -161,14 +159,14 @@ static void skw_tcpopt_window_handle(struct sk_buff *skb)
 			default:
 				if (length < 2)
 					return;
-				opsize=*ptr++;
+				opsize =  *ptr++;
 				if (opsize < 2) /* "silly options" */
 					return;
 				if (opsize > length)
 					return;	/* don't parse partial options */
 
-				if (opcode == TCPOPT_WINDOW
-					&& opsize == TCPOLEN_WINDOW) {
+				if (opcode == TCPOPT_WINDOW &&
+					opsize == TCPOLEN_WINDOW) {
 					//skw_dbg("val:%d\n", *ptr);
 					if (*ptr < 6) {
 						*ptr = 6;
@@ -304,7 +302,7 @@ int skw_init_rps_map(struct netdev_rx_queue *queue, int unmask)
 	spin_unlock(&rps_map_lock);
 
 	if (map) {
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 2, 0))
+#if (KERNEL_VERSION(5, 2, 0) <= LINUX_VERSION_CODE)
 		static_key_slow_inc(&rps_needed.key);
 #else
 		static_key_slow_inc(&rps_needed);
@@ -312,7 +310,7 @@ int skw_init_rps_map(struct netdev_rx_queue *queue, int unmask)
 	}
 
 	if (old_map) {
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 2, 0))
+#if (KERNEL_VERSION(5, 2, 0) <= LINUX_VERSION_CODE)
 		static_key_slow_dec(&rps_needed.key);
 #else
 		static_key_slow_dec(&rps_needed);
@@ -410,7 +408,6 @@ static void skw_deliver_skb(struct skw_iface *iface, struct sk_buff *skb)
 
 	ret = NET_RX_SUCCESS;
 
-
 #ifdef CONFIG_RPS
 	if (iface->cpu_id != raw_smp_processor_id()) {
 		iface->cpu_id = raw_smp_processor_id();
@@ -459,7 +456,6 @@ skw_frag_get_entry(struct skw_iface *iface, u8 tid, u16 sn, bool active)
 		}
 
 		if (!active) {
-
 			// skw_dbg("i: %d,entry tid: %d, sn: %d, status: %d\n",
 			//        i, e->tid, e->sn, e->status);
 
@@ -483,6 +479,7 @@ skw_frag_get_entry(struct skw_iface *iface, u8 tid, u16 sn, bool active)
 
 	return entry;
 }
+
 // Firmware will cover the exception that receiving a fragment
 // frame while in a ba session
 // Firmware will split A-MSDU frame to MSDU to Wi-Fi driver
@@ -539,7 +536,6 @@ skw_rx_defragment(struct skw_core *skw, struct skw_iface *iface,
 	//	desc->peer_idx, desc->tid, desc->sn,
 	//	desc->more_frag, desc->frag_num);
 
-
 	if (desc->frag_num == 0) {
 		desc->csum_valid = 0;
 		desc->csum = 0;
@@ -591,7 +587,6 @@ skw_rx_defragment(struct skw_core *skw, struct skw_iface *iface,
 	if (skb_tailroom(pskb) < entry->pending_len) {
 		if (unlikely(pskb_expand_head(pskb, 0, entry->pending_len,
 						GFP_ATOMIC))) {
-
 			skw_warn("drop: tailroom: %d, needed: %d\n",
 				 skb_tailroom(pskb), entry->pending_len);
 
@@ -645,7 +640,7 @@ static int skw_pn_allowed(struct skw_key *key, struct skw_rx_desc *desc, int que
 static int skw_replay_detect(struct skw_core *skw, struct skw_iface *iface,
 			struct sk_buff *skb)
 {
-	int64_t ret = 0;
+	s64 ret = 0;
 	int key_idx, queue = -1;
 	struct skw_key *key;
 	struct skw_key_conf *conf;
@@ -739,7 +734,7 @@ static void skw_rx_handler(struct skw_core *skw, struct sk_buff_head *list)
 		trace_skw_rx_handler_seq(desc->sn, desc->msdu_filter);
 
 		iface = to_skw_iface(skw, desc->inst_id);
-		if (iface == NULL) {
+		if (!iface) {
 			dev_kfree_skb(skb);
 			continue;
 		}
@@ -794,7 +789,6 @@ static void skw_set_reorder_timer(struct skw_tid_rx *tid_rx, u16 sn)
 		reorder->expired.ref_cnt = tid_rx->ref_cnt;
 		mod_timer(&reorder->timer, timeout);
 	} else {
-
 		spin_lock_bh(&reorder->todo.lock);
 
 		if (!reorder->todo.actived) {
@@ -802,7 +796,6 @@ static void skw_set_reorder_timer(struct skw_tid_rx *tid_rx, u16 sn)
 			reorder->todo.actived = true;
 			reorder->todo.reason = SKW_RELEASE_EXPIRED;
 			skw_list_add(&reorder->skw->rx_todo_list, &reorder->todo.list);
-
 		}
 
 		spin_unlock_bh(&reorder->todo.lock);
@@ -1207,7 +1200,6 @@ static void skw_rx_todo(struct skw_list *todo_list)
 
 	spin_unlock_bh(&todo_list->lock);
 
-
 	while (!list_empty(&list)) {
 		reorder = list_first_entry(&list, struct skw_reorder_rx,
 					   todo.list);
@@ -1232,7 +1224,6 @@ static void skw_rx_todo(struct skw_list *todo_list)
 		trace_skw_rx_expired_release(reorder->inst, reorder->peer_idx,
 					reorder->tid, reorder->todo.seq);
 	}
-
 }
 
 static void skw_rx_handler_drop_info(struct skw_core *skw, struct sk_buff *pskb,
@@ -1298,7 +1289,7 @@ static void skw_netif_monitor_rx(struct skw_core *skw, struct sk_buff *skb)
 	struct skw_iface *iface;
 	struct skw_rx_desc *desc;
 
-	desc = (struct skw_rx_desc *) skb->data;
+	desc = (struct skw_rx_desc *)skb->data;
 	if (unlikely(!desc->msdu_len)) {
 		skw_detail("strip invalid pakcet\n");
 		kfree_skb(skb);
@@ -1564,7 +1555,6 @@ void skw_rx_worker(struct work_struct *work)
 	__skb_queue_head_init(&qlist);
 
 	while (skw->rx_todo_list.count || skb_queue_len(&skw->rx_dat_q)) {
-
 		skw_rx_todo(&skw->rx_todo_list);
 
 		if (skb_queue_empty(&skw->rx_dat_q))
@@ -1697,7 +1687,7 @@ int skw_rx_cb(int port, struct scatterlist *sglist,
 	rx_sdma = skw->hw_pdata->bus_type & RX_SDMA;
 
 	for_each_sg(sglist, sg, nents, idx) {
-		if (sg == NULL || !sg->length) {
+		if (!sg || !sg->length) {
 			skw_warn("sg: 0x%p, nents: %d, idx: %d, len: %d\n",
 				sg, nents, idx, sg ? sg->length : 0);
 			break;
@@ -1800,7 +1790,6 @@ int skw_rx_cb(int port, struct scatterlist *sglist,
 			}
 
 		} else {
-
 			skw_data_add_credit(skw, skb->data);
 			skb_queue_tail(&skw->rx_dat_q, skb);
 

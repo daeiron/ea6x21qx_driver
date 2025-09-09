@@ -312,14 +312,14 @@ static int skw_keep_active_set(struct net_device *dev, u8 *param, int len)
 	hex = strstr(hex, "idx=");
 	if (hex) {
 		ch = strsep(&hex, "=");
-		if ((ch == NULL) || (strlen(ch) == 0)) {
+		if ((!ch) || (strlen(ch) == 0)) {
 			skw_err("idx param\n");
 			ret = -EFAULT;
 			goto error;
 		}
 
 		ch = strsep(&hex, ",");
-		if ((ch == NULL) || (strlen(ch) == 0)) {
+		if ((!ch) || (strlen(ch) == 0)) {
 			skw_err("idx param\n");
 			ret = -ERANGE;
 			goto error;
@@ -345,14 +345,14 @@ static int skw_keep_active_set(struct net_device *dev, u8 *param, int len)
 	hex = strstr(hex, "en=");
 	if (hex) {
 		ch = strsep(&hex, "=");
-		if ((ch == NULL) || (strlen(ch) == 0)) {
+		if ((!ch) || (strlen(ch) == 0)) {
 			skw_err("en param\n");
 			ret = -EFAULT;
 			goto error;
 		}
 
 		ch = strsep(&hex, ",");
-		if ((ch == NULL) || (strlen(ch) == 0)) {
+		if ((!ch) || (strlen(ch) == 0)) {
 			skw_err("en param\n");
 			ret = -ERANGE;
 			goto error;
@@ -376,14 +376,14 @@ static int skw_keep_active_set(struct net_device *dev, u8 *param, int len)
 	hex = strstr(hex, "period=");
 	if (hex) {
 		ch = strsep(&hex, "=");
-		if ((ch == NULL) || (strlen(ch) == 0)) {
+		if ((!ch) || (strlen(ch) == 0)) {
 			skw_err("period param\n");
 			ret = -EFAULT;
 			goto error;
 		}
 
 		ch = strsep(&hex, ",");
-		if ((ch == NULL) || (strlen(ch) == 0)) {
+		if ((!ch) || (strlen(ch) == 0)) {
 			skw_err("period param\n");
 			ret = -ERANGE;
 			goto error;
@@ -395,7 +395,6 @@ static int skw_keep_active_set(struct net_device *dev, u8 *param, int len)
 			ret = -EINVAL;
 			goto error;
 		}
-
 	}
 
 	if (!hex)
@@ -404,14 +403,14 @@ static int skw_keep_active_set(struct net_device *dev, u8 *param, int len)
 	hex = strstr(hex, "flags=");
 	if (hex) {
 		ch = strsep(&hex, "=");
-		if ((ch == NULL) || (strlen(ch) == 0)) {
+		if ((!ch) || (strlen(ch) == 0)) {
 			skw_err("flags param\n");
 			ret = -EFAULT;
 			goto error;
 		}
 
 		ch = strsep(&hex, ",");
-		if ((ch == NULL) || (strlen(ch) == 0)) {
+		if ((!ch) || (strlen(ch) == 0)) {
 			skw_err("flags param\n");
 			ret = -ERANGE;
 			goto error;
@@ -431,7 +430,7 @@ static int skw_keep_active_set(struct net_device *dev, u8 *param, int len)
 	hex = strstr(hex, "pkt=");
 	if (hex) {
 		ch = strsep(&hex, "=");
-		if ((ch == NULL) || (strlen(ch) == 0)) {
+		if ((!ch) || (strlen(ch) == 0)) {
 			skw_err("pkt param\n");
 			ret = -EFAULT;
 			goto error;
@@ -628,7 +627,7 @@ int skw_wow_filter_set(struct net_device *ndev, u8 *param, int len, char *resp)
 				ptn->offset = offset;
 
 				ch = strsep(&hex, "+");
-				if ((ch == NULL) || (strlen(ch) == 0)) {
+				if ((!ch) || (strlen(ch) == 0)) {
 					resp_len = sprintf(resp,
 						"ERROR: %s\n",
 						"match char +\n");
@@ -760,7 +759,7 @@ static int skw_iwpriv_keep_alive(struct net_device *dev,
 	char help[] = "ERROR useage:[idx=0,en=0/1,period=100,flags=0/1,pkt=7c:11]";
 	int ret = 0;
 
-	WARN_ON(SKW_KEEP_BUF_SIZE < wrqu->data.length);
+	WARN_ON(wrqu->data.length > SKW_KEEP_BUF_SIZE);
 
 	param = SKW_ZALLOC(SKW_KEEP_BUF_SIZE, GFP_KERNEL);
 	if (!param) {
@@ -831,7 +830,7 @@ static int skw_send_at_cmd(struct skw_core *skw, char *cmd, int cmd_len,
 			char *buf, int buf_len)
 {
 	int ret, len, resp_len, offset;
- 	char *command, *resp;
+	char *command, *resp;
 
 	len = round_up(cmd_len, 4);
 	if (len > SKW_SET_LEN_256)
@@ -963,7 +962,7 @@ static int skw_iwpriv_set_bandcfg(struct skw_iface *iface, void *param,
 	u16 res;
 	int ret;
 
-	if (args == NULL)
+	if (!args)
 		return -EINVAL;
 
 	ret = kstrtou16(args, 10, &res);

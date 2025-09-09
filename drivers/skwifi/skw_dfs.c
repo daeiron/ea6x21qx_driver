@@ -182,7 +182,7 @@ static bool pulse_queue_dequeue(struct skw_core *skw, struct skw_pri_detector *p
 {
 	struct skw_pulse_elem *p = pulse_queue_get_tail(pde);
 
-	if (p != NULL) {
+	if (p) {
 		list_del_init(&p->head);
 		pde->count--;
 		/* give it back to pool */
@@ -330,6 +330,7 @@ static bool pseq_handler_create_sequences(struct skw_core *skw,
 		/* check which past pulses are candidates for new sequence */
 		list_for_each_entry_continue(p2, &cfg->pri.pulses, head) {
 			u32 factor;
+
 			if (p2->ts < min_valid_ts)
 				/* stop on crossing window border */
 				break;
@@ -358,12 +359,11 @@ static bool pseq_handler_create_sequences(struct skw_core *skw,
 		/* this is a valid one, add it */
 		ps.deadline_ts = ps.first_ts + ps.dur;
 		new_ps = pool_get_pseq_elem(skw);
-		if (new_ps == NULL) {
+		if (!new_ps) {
 			new_ps = kmalloc(sizeof(*new_ps), GFP_ATOMIC);
-			if (new_ps == NULL) {
+			if (!new_ps) {
 				return false;
 			}
-
 		}
 
 		memcpy(new_ps, &ps, sizeof(ps));
@@ -418,9 +418,9 @@ static bool pulse_queue_enqueue(struct skw_core *skw, struct skw_pri_detector *p
 {
 	struct skw_pulse_elem *p = pool_get_pulse_elem(skw);
 
-	if (p == NULL) {
+	if (!p) {
 		p = kmalloc(sizeof(*p), GFP_ATOMIC);
-		if (p == NULL)
+		if (!p)
 			return false;
 	}
 
@@ -707,7 +707,6 @@ int skw_dfs_deinit(struct wiphy *wiphy, struct net_device *dev)
 	struct skw_iface *iface = netdev_priv(dev);
 
 	if (test_bit(SKW_DFS_FLAG_CAC_MODE, &iface->sap.dfs.flags)) {
-
 		cancel_delayed_work_sync(&iface->sap.dfs.cac_work);
 
 		skw_dfs_stop_cac(wiphy, dev);

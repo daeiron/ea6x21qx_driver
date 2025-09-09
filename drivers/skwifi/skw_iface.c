@@ -78,7 +78,6 @@ static int skw_iface_show(struct seq_file *seq, void *data)
 				bss->bssid,
 				bss->channel ? bss->channel->hw_value : -1,
 				skw_width_name(bss->width));
-
 	}
 
 	peer_idx_map = atomic_read(&iface->peer_map);
@@ -949,7 +948,6 @@ void skw_peer_free(struct skw_peer *peer)
 	call_rcu(&entry->rcu, skw_peer_release);
 #endif
 }
-
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
 static void skw_reorder_timeout(struct timer_list *timer)

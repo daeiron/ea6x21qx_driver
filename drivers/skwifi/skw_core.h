@@ -503,8 +503,8 @@ struct skw_calib_param {
 	u8 data[512];
 } __packed;
 
-extern int skw_start_wifi_service(void);
-extern int skw_stop_wifi_service(void);
+int skw_start_wifi_service(void);
+int skw_stop_wifi_service(void);
 
 #define SKW_WIPHY_DENTRY(w) (((struct skw_core *)wiphy_priv(w))->dentry)
 #define SKW_WIPHY_PENTRY(w) (((struct skw_core *)wiphy_priv(w))->pentry)

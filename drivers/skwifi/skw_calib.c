@@ -140,15 +140,15 @@ static int skw_dpd_cali_download(struct wiphy *wiphy,
 		}
 	}
 
-	fp = skw_file_open(store_file, O_RDWR|O_CREAT, 0666);
+	fp = skw_file_open(store_file, O_RDWR | O_CREAT, 0666);
 	if (!fp) {
 		skw_err("skw_file_open Fail\n");
 		ret = -ENOENT;
 		goto relese_ilc;
 	}
 
-	*(u32 *)(skw->dpd.resource + SKW_DPD_RESOURCE_DATA_CNT)
-		= crc32c(0, skw->dpd.resource, SKW_DPD_RESOURCE_DATA_CNT);
+	*(u32 *)(skw->dpd.resource + SKW_DPD_RESOURCE_DATA_CNT) =
+		crc32c(0, skw->dpd.resource, SKW_DPD_RESOURCE_DATA_CNT);
 
 	ret = skw_file_write(fp, skw->dpd.resource, skw->dpd.size, 0);
 	if (ret < 0)
@@ -320,7 +320,7 @@ int skw_dpd_set_coeff_params(struct wiphy *wiphy,
 			return -EINVAL;
 
 		if (para[index].invalid == 1) {
-			for (i = 0; i < max(index, (SKW_DPD_CHN_CNT-index));
+			for (i = 0; i < max(index, (SKW_DPD_CHN_CNT - index));
 				i++) {
 				if ((index - i >= 0))
 					if (para[index - i].invalid == 0) {
@@ -346,7 +346,7 @@ int skw_dpd_set_coeff_params(struct wiphy *wiphy,
 		para[index].center_two_ch, para[index].band);
 
 	ret = skw_send_msg(wiphy, ndev, SKW_CMD_DPD_ILC_COEFF_PARAM,
-		&(para[index]), sizeof(struct skw_ilc_result_param), NULL, 0);
+		&para[index], sizeof(struct skw_ilc_result_param), NULL, 0);
 	if (ret)
 		skw_err("Send ilc coeff failed, ret: %d", ret);
 

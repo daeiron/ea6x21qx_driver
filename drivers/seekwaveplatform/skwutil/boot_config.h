@@ -9,8 +9,8 @@
 #include <linux/gpio.h>
 #include <linux/delay.h>
 #include "skw_boot.h"
-#define  MODEM_ENABLE_GPIO   	482
-#define  HOST_WAKEUP_GPIO_IN 	-1
+#define  MODEM_ENABLE_GPIO	482
+#define  HOST_WAKEUP_GPIO_IN	-1
 #define  MODEM_WAKEUP_GPIO_OUT  -1
 #define  SEEKWAVE_NV_NAME  "SEEKWAVE_NV_SWT6621S.bin"
 //#define CONFIG_SEEKWAVE_FIRMWARE_LOAD
@@ -33,16 +33,17 @@
 
 //#define  USB_POWEROFF_IN_LOWPOWER  1
 #if defined(CONFIG_SKW_HOST_PLATFORM_AMLOGIC)
-extern void extern_wifi_set_enable(int is_on);
+void extern_wifi_set_enable(int is_on);
 #elif defined(CONFIG_SKW_HOST_PLATFORM_ALLWINER)
-extern void sunxi_wlan_set_power(int on);
+void sunxi_wlan_set_power(int on);
 #elif defined(CONFIG_SKW_HOST_PLATFORM_ROCKCHIP)
-extern int rockchip_wifi_power(int on);
+int rockchip_wifi_power(int on);
 #else
-static inline int skw_chip_power_ops(int on){
-    if(on){
+static inline int skw_chip_power_ops(int on)
+{
+    if (on) {
 		printk("skw self controll chip power on !!\n");
-    }else{
+    } else {
 		printk("skw self controll chip power down !!\n");
     }
 	return 0;
@@ -60,8 +61,8 @@ static inline void skw_chip_set_power(int on)
 #else
 	skw_chip_power_ops(on);
 #endif
-
 }
+
 static inline void skw_chip_power_reset(void)
 {
 #if defined(CONFIG_SKW_HOST_PLATFORM_AMLOGIC)
@@ -86,6 +87,7 @@ static inline void skw_chip_power_reset(void)
 	skw_chip_power_ops(1);
 #endif
 }
+
 //#define  STR_MODE_REINITBUS  1
 #endif /* __BOOT_CONFIG_H__ */
 

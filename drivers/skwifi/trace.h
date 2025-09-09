@@ -297,8 +297,7 @@ TRACE_EVENT(skw_rx_data,
 	    __entry->fake_ack = fake_ack;
 	    ),
 
-	    TP_printk("I: %d, P: %d, T: %d, filter: %d, seq: %d, qos: %d, "
-		      "retry: %d, amsdu: %d, idx: %d(F: %d, L: %d), fake ack: %d",
+	    TP_printk("I: %d, P: %d, T: %d, filter: %d, seq: %d, qos: %d, retry: %d, amsdu: %d, idx: %d(F: %d, L: %d), fake ack: %d",
 		      __entry->inst, __entry->pid,
 		      __entry->tid, __entry->filter,
 		      __entry->seq, __entry->qos,
@@ -342,8 +341,7 @@ TRACE_EVENT(skw_rx_reorder,
 	    __entry->drop = drop;
 	    ),
 
-	    TP_printk("ssn: %d, sn: %d (%d, %d), release: %d, drop: %d, stored: %d, "
-		      "I: %d, P: %d, T: %d, win_sz: %d, amsdu: %d, idx: %d",
+	    TP_printk("ssn: %d, sn: %d (%d, %d), release: %d, drop: %d, stored: %d, I: %d, P: %d, T: %d, win_sz: %d, amsdu: %d, idx: %d",
 		      __entry->win_start, __entry->sn,
 		      __entry->win_start % __entry->win_size,
 		      __entry->sn % __entry->win_size,
@@ -553,7 +551,7 @@ TRACE_EVENT(skw_hw_adma_tx_done,
        TP_STRUCT__entry(__field(u8, num)),
 
        TP_fast_assign(
-               __entry->num = num;
+	       __entry->num = num;
        ),
 
        TP_printk("num:%d", __entry->num)

@@ -118,7 +118,6 @@ void skw_mlme_ap_del_sta(struct wiphy *wiphy, struct net_device *ndev,
 		skw_err("failed, ret: %d\n", ret);
 		return;
 	}
-
 }
 
 static void skw_mlme_ap_auth_timeout(void *data)
@@ -245,7 +244,7 @@ static void skw_mlme_ap_assoc_cb(struct skw_iface *iface,
 		if (client->assoc_req_ie) {
 			info.assoc_req_ies = client->assoc_req_ie;
 			info.assoc_req_ies_len = client->assoc_req_ie_len;
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 0, 0))
+#if (KERNEL_VERSION(4, 0, 0) > LINUX_VERSION_CODE)
 			info.filled |= STATION_INFO_ASSOC_REQ_IES;
 #endif
 		}
@@ -353,7 +352,6 @@ static int skw_mlme_ap_auth_reply(struct skw_iface *iface,
 
 	return ret;
 }
-
 
 #if 0
 static int skw_ap_auth_shared_key(struct skw_client *sta, u16 trans_action)
@@ -532,7 +530,6 @@ static int skw_mlme_ap_auth_handler(struct skw_iface *iface, int freq,
 			status = WLAN_STATUS_UNKNOWN_AUTH_TRANSACTION;
 			break;
 		}
-
 
 		break;
 
@@ -1126,7 +1123,6 @@ int skw_mlme_sta_rx_auth(struct skw_iface *iface, int freq, int signal,
 
 	if (SKW_TEST(conn->flags, SKW_CONN_FLAG_AUTH_AUTO) &&
 	    status_code == WLAN_STATUS_NOT_SUPPORTED_AUTH_ALG) {
-
 		mutex_lock(&iface->sta.conn->lock);
 
 		switch (conn->auth_type) {

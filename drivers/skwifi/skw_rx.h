@@ -133,7 +133,6 @@ struct skw_rx_desc {
 	u32 snr:6;
 	u32 rvd10:10;
 
-
 	/* word 11 */
 	u8 sbw:2;
 	u8 dcm:1;
@@ -154,7 +153,6 @@ struct skw_rx_desc {
 
 static inline void skw_snap_unmatch_handler(struct sk_buff *skb)
 {
-
 	/* Add 2 bytes for length field */
 	skb_push(skb, 2);
 	memmove(skb->data, skb->data + 2, 12);

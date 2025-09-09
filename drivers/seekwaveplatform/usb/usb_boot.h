@@ -3,18 +3,16 @@
 /******************************************************************
  * **Description:download image，addrress and img size
  * Seekwave tech LTD
- * *	StartDownload 	0x0001
+ * *	StartDownload	0x0001
  * *
- * * MAGIC 4B	Length 4B MessageType 2B  	2B	CRC 0x7E7E7E7E
+ * * MAGIC 4B	Length 4B MessageType 2B	2B	CRC 0x7E7E7E7E
  * **
  * ******************************************************************/
 
 struct connect_ack {
    unsigned int packet_size;
-   union packet_attr_tag
-   {
-		   struct connect_attr_map
-		   {
+   union packet_attr_tag {
+		   struct connect_attr_map {
 				   unsigned int check_sum	   :1;
 				   unsigned int smp			 :1;
 				   unsigned int boot			:1;
@@ -22,25 +20,25 @@ struct connect_ack {
 				   unsigned int strapin		 :2;
 				   unsigned int usb_sdio_dis	:2;
 				   unsigned int res1			:24;
-		   }bitmap;
-		   unsigned int dwValue;
-   }flags;
+		   } bitmap;
+		unsigned int dwValue;
+   } flags;
    unsigned int  chip_id[4];
 };
 
-typedef struct PACKET_BODY_tag{
+typedef struct PACKET_BODY_tag {
 	unsigned int magic;	 //magic
 	unsigned int size;			  //length,length - 12
 	unsigned short type;			  //type,the type defferent cmd
 	unsigned short crc;		//checksum
 	unsigned char content[MAX_PACKET_SIZE];
-}PACKET_T;
+} PACKET_T;
 #define PACKET_HEADER_SIZE		(sizeof(struct PACKET_BODY_tag) - MAX_PACKET_SIZE)
 #ifndef MIN
-#define MIN(a,b)			(((a) < (b)) ? (a) : (b))
+#define MIN(a, b)			(((a) < (b)) ? (a) : (b))
 #endif
 #ifndef MAX
-#define MAX(a,b)			(((a) > (b)) ? (a) : (b))
+#define MAX(a, b)			(((a) > (b)) ? (a) : (b))
 #endif
 #define DEBUG
 #define NORMAL_BOOT 0
@@ -86,9 +84,9 @@ static int dloader_send_command(const char *command,  int command_len, const cha
     do {                         \
 	ret = dloader_send_command(client_version, sizeof(client_version),	\
 			client_version_ack, sizeof(client_version_ack)); \
-    }while(0)
+    } while (0)
 
 #define dloader_command_connect()				\
     do {                         \
 	ret = dloader_send_command(connect, sizeof(connect), connect_ack, sizeof(connect_ack)); \
-    }while(0)
+    } while (0)

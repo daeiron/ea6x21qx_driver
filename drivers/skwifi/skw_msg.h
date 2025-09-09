@@ -223,7 +223,7 @@ struct skw_msg {
 	u16 seq;
 	u16 total_len;
 	u8 resv[2];
-	u16 data[0];
+	u16 data[];
 };
 
 struct skw_mgmt_hdr {
@@ -231,7 +231,7 @@ struct skw_mgmt_hdr {
 	s16 signal;
 	u16 mgmt_len;
 	u16 resv;
-	struct ieee80211_mgmt mgmt[0];
+	struct ieee80211_mgmt mgmt[];
 } __packed;
 
 struct skw_tx_mgmt_status {
@@ -273,43 +273,43 @@ struct skw_discon_event_params {
  */
 
 struct llc {
-	u_int8_t llc_dsap;
-	u_int8_t llc_ssap;
+	u8 llc_dsap;
+	u8 llc_ssap;
 	union {
 	    struct {
-		u_int8_t control;
-		u_int8_t format_id;
-		u_int8_t class;
-		u_int8_t window_x2;
+		u8 control;
+		u8 format_id;
+		u8 class;
+		u8 window_x2;
 	    } __packed type_u;
 	    struct {
-		u_int8_t num_snd_x2;
-		u_int8_t num_rcv_x2;
+		u8 num_snd_x2;
+		u8 num_rcv_x2;
 	    } __packed type_i;
 	    struct {
-		u_int8_t control;
-		u_int8_t num_rcv_x2;
+		u8 control;
+		u8 num_rcv_x2;
 	    } __packed type_s;
 	    struct {
-		u_int8_t control;
+		u8 control;
 		/*
 		 * We cannot put the following fields in a structure because
 		 * the structure rounding might cause padding.
 		 */
-		u_int8_t frmr_rej_pdu0;
-		u_int8_t frmr_rej_pdu1;
-		u_int8_t frmr_control;
-		u_int8_t frmr_control_ext;
-		u_int8_t frmr_cause;
+		u8 frmr_rej_pdu0;
+		u8 frmr_rej_pdu1;
+		u8 frmr_control;
+		u8 frmr_control_ext;
+		u8 frmr_cause;
 	    } __packed type_frmr;
 	    struct {
-		u_int8_t  control;
-		u_int8_t  org_code[3];
-		u_int16_t ether_type;
+		u8  control;
+		u8  org_code[3];
+		u16 ether_type;
 	    } __packed type_snap;
 	    struct {
-		u_int8_t control;
-		u_int8_t control_ext;
+		u8 control;
+		u8 control_ext;
 	    } __packed type_raw;
 	} llc_un /* XXX __packed ??? */;
 } __packed;
@@ -318,9 +318,8 @@ struct skw_frame_tx_status {
 	u8 status;
 	u8 resv;
 	u16 mgmt_len;
-	struct ieee80211_mgmt mgmt[0];
+	struct ieee80211_mgmt mgmt[];
 } __packed;
-
 
 enum SKW_OFFLOAD_PAT_OP_TYPE {
 	PAT_OP_TYPE_SAME = 0,
@@ -339,7 +338,7 @@ struct skw_pkt_pattern {
 	u8 type_offset;
 	u16 offset;
 	u8 len;
-	u8 val[0];
+	u8 val[];
 } __packed;
 
 #define SKW_MAX_WOW_RULE_NUM           2
@@ -351,7 +350,7 @@ struct skw_wow_rule {
 struct skw_wow_input_param {
 	u32 wow_flags;
 	u8 rule_num;
-	struct skw_wow_rule rules[0];
+	struct skw_wow_rule rules[];
 } __packed;
 
 enum SKW_SPD_ACTION_SUBCMD {
@@ -420,7 +419,6 @@ int skw_msg_xmit_timeout(struct wiphy *wiphy, int dev_id, int cmd,
 	skw_msg_xmit_timeout(wiphy, dev ? SKW_NDEV_ID(dev) : -1,                \
 			cmd, buf, len, arg, size, #cmd,                         \
 			msecs_to_jiffies(SKW_CMD_TIMEOUT), 0)
-
 
 int skw_msg_try_send(struct skw_core *skw, int dev_id,
 		     int cmd, void *data, int data_len,

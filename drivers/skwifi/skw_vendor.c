@@ -374,7 +374,7 @@ static int skw_vendor_get_logger_feature(struct wiphy *wiphy,
 	return skw_vendor_cmd_reply(wiphy, &features, sizeof(features));
 }
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 3, 0))
+#if (KERNEL_VERSION(5, 3, 0) <= LINUX_VERSION_CODE)
 #define SKW_VENDOR_CMD(oui, cmd, flag, func, nla_policy, max_attr)  \
 {                                                                   \
 	.info = {.vendor_id = oui, .subcmd = cmd},                  \

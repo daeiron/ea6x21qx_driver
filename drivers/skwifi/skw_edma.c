@@ -219,7 +219,7 @@ failed:
 static int
 skw_edma_tx_node_isr(void *priv, void *first_pa, void *last_pa, int count)
 {
-	struct skw_edma_context *context = (struct skw_edma_context *) priv;
+	struct skw_edma_context *context = (struct skw_edma_context *)priv;
 	u16 channel = context->channel;
 	struct skw_core *skw = context->skw;
 	struct skw_edma_chn *edma_chn = NULL;
@@ -252,7 +252,7 @@ skw_edma_tx_node_isr(void *priv, void *first_pa, void *last_pa, int count)
 					- 8 - edma_chn->edma_hdr_pa;
 	//skw_dbg("offset:%d channel:%d\n", offset, edma_chn->channel);
 	//edma_hdr = (struct skw_edma_hdr *) (phys_to_virt(first_pa) - 8);
-	edma_hdr = (struct skw_edma_hdr *) ((u8 *)edma_chn->hdr + offset);
+	edma_hdr = (struct skw_edma_hdr *)((u8 *)edma_chn->hdr + offset);
 	//skw_dbg("edma_hdr:%p\n", edma_hdr);
 	while (i < count) {
 		pa = edma_hdr->buffer_pa; //pcie address
@@ -284,7 +284,7 @@ skw_pci_edma_tx_free(struct skw_core *skw, struct sk_buff_head *free_list,
 	unsigned long flags;
 	struct sk_buff *skb, *tmp;
 	struct sk_buff_head qlist;
-	u64 *p = (u64 *) data;
+	u64 *p = (u64 *)data;
 	u64 p_data = 0;
 	int i = 0, j = 0, m = 0;
 	//u64 tmp_out = 0;
@@ -349,7 +349,7 @@ static void skw_pci_edma_rx_data(struct skw_core *skw, void *data, int data_len)
 		p = (u64 *)((u8 *)data + i);
 		p_data = skw->hw_pdata->pcieaddr_to_virtaddr(*p & 0xFFFFFFFFFF);
 
-		desc = (struct skw_rx_desc *) ((u8 *) (p_data + 52));
+		desc = (struct skw_rx_desc *)((u8 *) (p_data + 52));
 
 		//FW use this way to return unused buff
 		if (unlikely(!desc->msdu_len)) {
@@ -422,8 +422,8 @@ void skw_pcie_edma_rx_cb(void *priv, void *data, u16 data_len)
 {
 	u16 channel = 0;
 	int ret = 0, total_len = 0;
-	struct skw_edma_context *context = (struct skw_edma_context *) priv;
-	struct skw_core *skw = (struct skw_core *) context->skw;
+	struct skw_edma_context *context = (struct skw_edma_context *)priv;
+	struct skw_core *skw = (struct skw_core *)context->skw;
 	struct skw_iface *iface = NULL;
 	struct skw_event_work *work = NULL;
 	struct sk_buff *skb = NULL;
@@ -454,7 +454,7 @@ void skw_pcie_edma_rx_cb(void *priv, void *data, u16 data_len)
 		skb_put(skb, data_len);
 		//skw_dbg("data len:%d\n", skb->len);
 		//skw_hex_dump("event content", skb->data, 16, 1);
-		msg = (struct skw_msg *) skb->data;
+		msg = (struct skw_msg *)skb->data;
 		switch (msg->type) {
 		case SKW_MSG_CMD_ACK:
 			skw_cmd_ack_handler(skw, skb->data, skb->len);
@@ -530,7 +530,7 @@ static int skw_edma_cache_init(struct skw_core *skw)
 	skw_edma_node_cache = kmem_cache_create("skw_edma_node_cache",
 						sizeof(struct skw_edma_node),
 						0, 0, NULL);
-	if (skw_edma_node_cache == NULL)
+	if (!skw_edma_node_cache)
 		return -ENOMEM;
 
 	return 0;
@@ -699,6 +699,7 @@ int skw_edma_init(struct wiphy *wiphy)
 
 	return 0;
 }
+
 //TBD: Use macro to define the node number for each channel
 
 void skw_edma_deinit(struct wiphy *wiphy)

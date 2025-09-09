@@ -316,7 +316,7 @@ static int skw_add_srates_ie(struct net_device *ndev, struct sk_buff *skb,
 			basic = 0x80;
 		rate = DIV_ROUND_UP(sband->bitrates[i].bitrate,
 				    5 * (1 << shift));
-		*pos++ = basic | (u8) rate;
+		*pos++ = basic | (u8)rate;
 	}
 
 	return 0;
@@ -367,7 +367,7 @@ static int skw_add_ext_srates_ie(struct net_device *ndev,
 				basic = 0x80;
 			rate = DIV_ROUND_UP(sband->bitrates[i].bitrate,
 					    5 * (1 << shift));
-			*pos++ = basic | (u8) rate;
+			*pos++ = basic | (u8)rate;
 		}
 	}
 
@@ -528,7 +528,7 @@ skw_add_wmm_ie(struct skw_iface *iface, struct sk_buff *skb,
 	if (skb_tailroom(skb) < wmmParamIe_len + 2)
 		return;
 
-	qosInfo = (pQosInfo == NULL) ? 0xf : (*pQosInfo);
+	qosInfo = (!pQosInfo) ? 0xf : (*pQosInfo);
 
 	/*wmm parameter */
 	if (wmm_type == SKW_WMM_TYPE_PARAMETER) {
@@ -834,7 +834,6 @@ static void skw_tdls_add_ies(struct net_device *ndev, struct sk_buff *skb,
 		const u8 *peer, u8 action, u16 status_code, u32 peer_cap,
 		bool initiator, const u8 *ies, size_t ies_len)
 {
-
 	switch (action) {
 	case WLAN_TDLS_SETUP_REQUEST:
 	case WLAN_TDLS_SETUP_RESPONSE:

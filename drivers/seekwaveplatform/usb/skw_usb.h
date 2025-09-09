@@ -3,7 +3,7 @@
  *Filename : skw_usb.h
  *Authors:seekwave platform
  *
- * This software is licensed under the terms of the the GNU
+ * This software is licensed under the terms of the GNU
  * General Public License version 2, as published by the Free
  * Software Foundation, and may be copied, distributed, and
  * modified under those terms.
@@ -37,11 +37,10 @@
 
 #define skwusb_data_pr(level, prefix_str, prefix_type, rowsize,\
 		groupsize, buf, len, asscii)\
-		do{if(loglevel) \
+		do {if (loglevel) \
 			print_hex_dump(level, prefix_str, prefix_type, rowsize,\
 					groupsize, buf, len, asscii);\
-		}while(0)
-
+		} while (0)
 
 #define USB_RX_TASK_PRIO 90
 #define SKW_CHIP_ID_LENGTH			16  //SV6160 chip id lenght
@@ -50,6 +49,5 @@ int skw_usb_recovery_debug(int disable);
 int skw_usb_recovery_debug_status(void);
 int skw_usb_debug_log_open(void);
 int skw_usb_debug_log_close(void);
-
 
 #endif /* WCN_USB_H */

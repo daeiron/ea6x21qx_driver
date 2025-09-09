@@ -247,11 +247,11 @@ static int skw_sync_sdma_tx(struct skw_core *skw, struct sk_buff_head *list,
 	ret = skw->hw_pdata->hw_sdma_tx(port, skw->sdma_buff, total_len);
 
 	if (list) {
-		if (likely(0 == ret))
+		if (likely(ret == 0))
 			skw_sub_credit(skw, lmac_id, skb_queue_len(list));
 
 		skb_queue_walk_safe(list, skb, tmp) {
-			if (likely(0 == ret)) {
+			if (likely(ret == 0)) {
 				skb->dev->stats.tx_packets++;
 				skb->dev->stats.tx_bytes += SKW_SKB_TXCB(skb)->skb_native_len;
 			} else
@@ -288,7 +288,6 @@ static int skw_sync_sdma_cmd_disable_irq_tx(struct skw_core *skw,
 	return skw->hw_pdata->suspend_sdma_cmd(port, skw->sdma_buff, total_len);
 }
 
-
 static int skw_async_sdma_tx(struct skw_core *skw, struct sk_buff_head *list,
 			int lmac_id, int port, struct scatterlist *sgl,
 			int nents, int tx_len)
@@ -312,11 +311,11 @@ static int skw_async_sdma_tx(struct skw_core *skw, struct sk_buff_head *list,
 		SKW_KFREE(buff);
 
 	if (list) {
-		if (likely(0 == ret))
+		if (likely(ret == 0))
 			skw_sub_credit(skw, lmac_id, skb_queue_len(list));
 
 		skb_queue_walk_safe(list, skb, tmp) {
-			if (likely(0 == ret)) {
+			if (likely(ret == 0)) {
 				skb->dev->stats.tx_packets++;
 				skb->dev->stats.tx_bytes += SKW_SKB_TXCB(skb)->skb_native_len;
 			} else
@@ -351,7 +350,7 @@ static int skw_sync_adma_tx(struct skw_core *skw, struct sk_buff_head *list,
 		skw_err("failed, ret: %d nents:%d\n", ret, nents);
 
 	if (list) {
-		if (likely(0 == ret))
+		if (likely(ret == 0))
 			skw_sub_credit(skw, lmac_id, skb_queue_len(list));
 		else
 			skb_queue_walk_safe(list, skb, tmp)
@@ -692,7 +691,7 @@ static void skw_kfree_skb_worker(struct work_struct *work)
 		}
 	}
 
-	return ;
+	return;
 }
 
 #ifdef CONFIG_SKW_TX_WORKQUEUE
@@ -732,7 +731,6 @@ start:
 	}
 
 	while (!atomic_read(&skw->exit)) {
-
 		// TODO:
 		/* CPU bind */
 		/* check if frame in pending queue is timeout */
@@ -771,7 +769,7 @@ start:
 
 			if (skw->hw.bus == SKW_BUS_PCIE)
 				skw_wakeup_tx(skw, 0);
-			return ;
+			return;
 		}
 
 		for (ac = 0; ac < SKW_WMM_AC_MAX; ac++) {
@@ -890,7 +888,6 @@ start:
 					base = 0;
 
 				for (i = 0; txlp->txq_map != 0; i++) {
-
 					i = i % txlp->nr_txq;
 					if (!(txlp->txq_map & BIT(i)))
 						continue;
@@ -914,7 +911,6 @@ start:
 					}
 
 					if (!is_skw_peer_data_valid(skw, skb)) {
-
 						skw_detail("drop dest: %pM\n",
 							   eth_hdr(skb)->h_dest);
 
@@ -993,7 +989,6 @@ reset:
 						xmit_tx_flag = 1;
 						spin_unlock_irqrestore(&iface->txq[ac].lock, flags);
 						goto need_running;
-
 					}
 
 					spin_unlock_irqrestore(&iface->txq[ac].lock, flags);
@@ -1010,7 +1005,6 @@ need_running:
 		}
 	}
 }
-
 
 
 static int __skw_tx_init(struct skw_core *skw)
@@ -1338,7 +1332,6 @@ reset:
 						xmit_tx_flag = 1;
 						spin_unlock_irqrestore(&iface->txq[ac].lock, flags);
 						goto need_running;
-
 					}
 					spin_unlock_irqrestore(&iface->txq[ac].lock, flags);
 				}

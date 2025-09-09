@@ -28,7 +28,7 @@
  *Modify:
  * ************************************************************************/
 static int dl_mps;
-static int dloader_port = 0;
+static int dloader_port;
 
 /***************************************************************************
  * Description:
@@ -40,9 +40,10 @@ static int dloader_port = 0;
 static int check_modem_status_from_connect_message(void)
 {
 	struct connect_ack *ack = (void *)&connect_ack[12];
-	memcpy(skw_chipid,ack->chip_id,16);
+
+	memcpy(skw_chipid, ack->chip_id, 16);
 	dl_mps = ack->packet_size;
-	if(ack->flags.bitmap.boot)
+	if (ack->flags.bitmap.boot)
 		return NORMAL_BOOT;
 	else
 		return NORMAL_BOOT;
@@ -106,16 +107,16 @@ static int dloader_send_data(const char *command, int command_len, const char *a
 		return -ENOMEM;
 	/* send command */
 	ret = dloader_write((char *)command, command_len, &actual_len, 3000);
-	if (ret <0 || actual_len != command_len) {
+	if (ret < 0 || actual_len != command_len) {
 		printk("%s send cmd error ret %d actual_len %d command_len %d\n",
 				__func__, ret, actual_len, command_len);
 	} else {
-		if (ack == NULL)
+		if (!ack)
 			goto OUT;
 
 		/* read ack and check it */
 		ret = dloader_read(data, data_size, &actual_len, 3000);
-		if (ret <0 || ack_len > actual_len || compare_msg(ack, data, ack_len)) {
+		if (ret < 0 || ack_len > actual_len || compare_msg(ack, data, ack_len)) {
 			printk("%s ack is NACK:ret-- %d\n", __func__, ret);
 			ret = -EIO;
 		}
@@ -143,20 +144,20 @@ static int dloader_send_command(const char *command,  int command_len, const cha
 	if (!data)
 		return -ENOMEM;
 	/* send command */
-	memcpy(data, (char*)command, command_len);
+	memcpy(data, (char *)command, command_len);
 	ret = dloader_write(data, command_len, &actual_len, 3000);
-	if (ret <0 || actual_len != command_len) {
+	if (ret < 0 || actual_len != command_len) {
 		printk("%s send cmd error ret %d actual_len %d command_len %d\n",
 				__func__, ret, actual_len, command_len);
 	} else {
 		/* read ack */
 		ret = dloader_read(data, data_size, &actual_len, 3000);
-		if (ret <0) {
+		if (ret < 0) {
 			printk("%s ack is NACK: acklen ===%d- actual_len ==%d--ret == %d\n",
 				__func__, ret, ack_len, actual_len);
 		}
 	}
-	if((command_len>8) && (0 == command[8]))
+	if ((command_len > 8) && (command[8] == 0))
 		memcpy(connect_ack, data, actual_len);
 	kfree(data);
 	return ret;
@@ -199,7 +200,6 @@ static unsigned short crc16_calculate(unsigned char *buf, int len)
  * ************************************************************************/
 int dloader_command_start_download(unsigned int addr, unsigned int len)
 {
-
 	int command_len = 20;
 	char command[20] = {0x7E, 0x7E, 0x7E, 0x7E,/* head */
 		0x08, 0x00, 0x00, 0x00, /*length */
@@ -226,7 +226,7 @@ int dloader_command_exec(unsigned int addr)
 {
 	unsigned short command_len = 16;
 
-	char command[16] = {0x7E,0x7E,0x7E,0x7E, /* head */
+	char command[16] = {0x7E, 0x7E, 0x7E, 0x7E, /* head */
 		0x04, 0x00, 0x00, 0x00,
 		0x04, 0x00, /*command type */
 		0x43, 0x63, /*command len */
@@ -258,7 +258,7 @@ int dloader_setup_usb_connection(struct usb_port_struct *port)
 		dev_err(&port->udev->dev, "connection  error\n");
 		return ret;
 	}
-	dev_info(&port->udev->dev,"dloader connect susscess...\n");
+	dev_info(&port->udev->dev, "dloader connect susscess...\n");
 	return 0;
 }
 
@@ -269,7 +269,7 @@ int dloader_setup_usb_connection(struct usb_port_struct *port)
  *Date:
  *Modify:
  * ************************************************************************/
-int dloader_execute_image(struct usb_port_struct *port,unsigned int addr)
+int dloader_execute_image(struct usb_port_struct *port, unsigned int addr)
 {
 	int ret;
 
@@ -280,6 +280,7 @@ int dloader_execute_image(struct usb_port_struct *port,unsigned int addr)
 	}
 	return 0;
 }
+
 /***************************************************************************
  * Description:
  *Seekwave tech LTD
@@ -287,7 +288,7 @@ int dloader_execute_image(struct usb_port_struct *port,unsigned int addr)
  *Date:
  *Modify:
  * ************************************************************************/
-static unsigned int dloader_send_pdata(char* buf, const void *pdata, unsigned int len)
+static unsigned int dloader_send_pdata(char *buf, const void *pdata, unsigned int len)
 {
 	PACKET_T *packet_ptr = (PACKET_T *)buf;
 	int command_len = len + PACKET_HEADER_SIZE;
@@ -296,11 +297,11 @@ static unsigned int dloader_send_pdata(char* buf, const void *pdata, unsigned in
 	packet_ptr->type = 0x0002;
 	packet_ptr->size = len;
 	packet_ptr->crc = 0x0000;
-	memset(packet_ptr->content, 0 , len);
-	memcpy(packet_ptr->content,pdata, len);
+	memset(packet_ptr->content, 0, len);
+	memcpy(packet_ptr->content, pdata, len);
 
 	//crc check sum
-	packet_ptr->crc = cpu_to_be16(crc16_calculate((char*)(&(packet_ptr->content)), command_len));
+	packet_ptr->crc = cpu_to_be16(crc16_calculate((char *)(&packet_ptr->content), command_len));
 
 	return command_len;
 }
@@ -323,20 +324,20 @@ int usb_download_image(struct usb_port_struct *port, unsigned int addr, unsigned
 	/*the first command connect*/
 	ret = dloader_command_start_download(addr, len);
 	if (ret < 0) {
-		dev_err(&port->udev->dev,"start download command failed\n");
+		dev_err(&port->udev->dev, "start download command failed\n");
 		return ret;
 	}
 	/*get the data and the sv6160.bin size*/
 	img_size = len;
 
 	while (img_size > 0) {
-		temp_size = MIN(dl_mps, img_size-offset);
-		if(!temp_size)
+		temp_size = MIN(dl_mps, img_size - offset);
+		if (!temp_size)
 			return 0;
-		size  = dloader_send_pdata(port->read_buffer, (void*)(firmware_data)+offset, temp_size);
-		if (size%512==0 && temp_size <= dl_mps) {
+		size  = dloader_send_pdata(port->read_buffer, (void*)(firmware_data) + offset, temp_size);
+		if (size % 512 == 0 && temp_size <= dl_mps) {
 			temp_size = temp_size >> 1;
-			size  = dloader_send_pdata(port->read_buffer, (void*)(firmware_data)+offset, temp_size);
+			size  = dloader_send_pdata(port->read_buffer, (void*)(firmware_data) + offset, temp_size);
 		}
 		ret = dloader_send_data(port->read_buffer, size, common_ack, sizeof(common_ack));
 		if (ret < 0) {
@@ -358,6 +359,7 @@ int usb_download_image(struct usb_port_struct *port, unsigned int addr, unsigned
 int dloader_get_chip_id(void *buf, unsigned int buf_size)
 {
 	int len = strlen(usb_ports[0]->udev->product);
+
 	memcpy(buf, usb_ports[0]->udev->product, strlen(usb_ports[0]->udev->product));
 	return len;
 }
@@ -390,7 +392,6 @@ int dloader_dump_from_romcode_usb(unsigned int addr, void *buf, int len)
 
 	*((u16 *)&command[10]) = cpu_to_be16(crc16_calculate(&command[1], command_len - 4));
 
-
 	ret = dloader_send_command(command, command_len, NULL, 0);
 	if (ret < 0) {
 		printk("%s send command error\n", __func__);
@@ -398,7 +399,7 @@ int dloader_dump_from_romcode_usb(unsigned int addr, void *buf, int len)
 	}
 
 	size = dl_mps;
-	while(len > 0) {
+	while (len > 0) {
 		if (len < size)
 			size = len;
 		ret = dloader_read(buf, size, &actual_len, 3000);
@@ -419,6 +420,7 @@ int dloader_dump_from_romcode_usb(unsigned int addr, void *buf, int len)
 static int dloader_dump_read_usb(struct usb_port_struct *port)
 {
 	int ret;
+
 	ret = dloader_dump_from_romcode_usb(START_ADDR, port->read_buffer, MAX_IMAGE_SIZE);
 	return ret;
 }
@@ -439,26 +441,26 @@ static void dloader_work(struct work_struct *work)
 	dloader_setup_usb_connection(port);
 
 	ret = check_modem_status_from_connect_message();
-	if (ret == HANG_REBOOT){
+	if (ret == HANG_REBOOT) {
 		dloader_dump_read_usb(port);
 	}
-	if(usb_boot_data->dram_dl_size > 0){
+	if (usb_boot_data->dram_dl_size > 0) {
 		firmware_data = usb_boot_data->dram_img_data;
 		ret = usb_download_image(port, usb_boot_data->dram_dl_addr, usb_boot_data->dram_dl_size);
-		if(ret <0) {
+		if (ret < 0) {
 			skw_usb_info("%s dram download img fail !!!!\n", __func__);
 		}
 	}
 
-	if( !ret  && usb_boot_data->iram_dl_size > 0){
+	if (!ret  && usb_boot_data->iram_dl_size > 0) {
 		firmware_data = usb_boot_data->iram_img_data;
 		ret = usb_download_image(port, usb_boot_data->iram_dl_addr, usb_boot_data->iram_dl_size);
 	}
 	if (ret == 0)
 		ret = dloader_execute_image(port, START_ADDR);
-	if (ret < 0 ) {
+	if (ret < 0) {
 		modem_status = MODEM_DOWNLOAD_FAILED;
-		
+
 		if (chip_en_gpio >= 0) {
 			skw_usb_info("download failed! power off device\n");
 			SKW_CHIP_POWEROFF(chip_en_gpio);

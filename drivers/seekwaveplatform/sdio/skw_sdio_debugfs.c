@@ -35,7 +35,7 @@ static const struct file_operations skw_sdio_state_fops = {
 struct dentry *skw_sdio_add_debugfs(const char *name, umode_t mode, void *data,
 			       const struct file_operations *fops)
 {
-	skw_sdio_dbg("%s:name: %s\n",__func__,name);
+	skw_sdio_dbg("%s:name: %s\n", __func__, name);
 
 	return debugfs_create_file(name, mode, skw_sdio_root_dir, data, fops);
 }

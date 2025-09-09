@@ -44,12 +44,12 @@ void skw_get_port_statistic(char *buffer, int size);
 
 #define skw_usb_port_log(port_num, fmt, ...) \
 	do { \
-		if (skw_usb_log_level() &(SKW_USB_PORT0<<port_num)) \
+		if (skw_usb_log_level() & (SKW_USB_PORT0 << port_num)) \
 			pr_err(fmt,  ##__VA_ARGS__); \
 	} while (0)
 
-#define skw_port_log(port_num,fmt, ...) \
-	skw_usb_log((SKW_USB_PORT0<<port_num), "[PORT_LOG] %s: "fmt, __func__, ##__VA_ARGS__)
+#define skw_port_log(port_num, fmt, ...) \
+	skw_usb_log((SKW_USB_PORT0 << port_num), "[PORT_LOG] %s: "fmt, __func__, ##__VA_ARGS__)
 
 #define skw_usb_err(fmt, ...) \
 	skw_usb_log(SKW_USB_ERROR, "[SKWUSB ERROR] %s: "fmt, __func__, ##__VA_ARGS__)
@@ -75,8 +75,8 @@ void skw_get_port_statistic(char *buffer, int size);
 #if 0
 #define skw_usb_port_log(port_num, fmt, ...) \
 	do { \
-		if (skw_usb_log_level() &(SKW_USB_PORT0<<port_num)) \
-			pr_err("[PORT_LOG] %s:"fmt,__func__,  ##__VA_ARGS__); \
+		if (skw_usb_log_level() & (SKW_USB_PORT0 << port_num)) \
+			pr_err("[PORT_LOG] %s:"fmt, __func__,  ##__VA_ARGS__); \
 	} while (0)
 
 #endif

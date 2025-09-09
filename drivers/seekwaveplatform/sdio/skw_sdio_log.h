@@ -38,12 +38,12 @@ unsigned long skw_sdio_log_level(void);
 
 #define skw_sdio_port_log(port_num, fmt, ...) \
 	do { \
-		if (skw_sdio_log_level() &(SKW_SDIO_PORT0<<port_num)) \
+		if (skw_sdio_log_level() & (SKW_SDIO_PORT0 << port_num)) \
 			pr_err(fmt,  ##__VA_ARGS__); \
 	} while (0)
 
-#define skw_port_log(port_num,fmt, ...) \
-	skw_sdio_log((SKW_SDIO_PORT0<<port_num), "[PORT_LOG] %s: "fmt, __func__, ##__VA_ARGS__)
+#define skw_port_log(port_num, fmt, ...) \
+	skw_sdio_log((SKW_SDIO_PORT0 << port_num), "[PORT_LOG] %s: "fmt, __func__, ##__VA_ARGS__)
 
 #define skw_sdio_err(fmt, ...) \
 	skw_sdio_log(SKW_SDIO_ERROR, "[SKWSDIO ERROR] %s: "fmt, __func__, ##__VA_ARGS__)
@@ -69,8 +69,8 @@ unsigned long skw_sdio_log_level(void);
 #if 0
 #define skw_sdio_port_log(port_num, fmt, ...) \
 	do { \
-		if (skw_sdio_log_level() &(SKW_SDIO_PORT0<<port_num)) \
-			pr_err("[PORT_LOG] %s:"fmt,__func__,  ##__VA_ARGS__); \
+		if (skw_sdio_log_level() & (SKW_SDIO_PORT0 << port_num)) \
+			pr_err("[PORT_LOG] %s:"fmt, __func__,  ##__VA_ARGS__); \
 	} while (0)
 
 #endif

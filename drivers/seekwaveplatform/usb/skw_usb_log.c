@@ -175,7 +175,7 @@ static const struct file_operations skw_usb_log_fops = {
 
 static int skw_version_show(struct seq_file *seq, void *data)
 {
-	seq_printf(seq, "firmware info:\n %s\n", firmware_version );
+	seq_printf(seq, "firmware info:\n %s\n", firmware_version);
 	return 0;
 }
 
@@ -184,7 +184,6 @@ static int skw_version_open(struct inode *inode, struct file *file)
 	return single_open(file, &skw_version_show, inode->i_private);
 }
 
-
 static const struct file_operations skw_version_fops = {
 	.owner = THIS_MODULE,
 	.open = skw_version_open,
@@ -192,35 +191,34 @@ static const struct file_operations skw_version_fops = {
 	.release = single_release,
 };
 
-
 static int skw_cp_log_show(struct seq_file *seq, void *data)
 {
 	if (!skw_usb_cp_log_status())
-		seq_printf(seq, "Enabled");
+		seq_puts(seq, "Enabled");
 	else
-		seq_printf(seq, "Disabled");
+		seq_puts(seq, "Disabled");
 	return 0;
 }
+
 static int skw_cp_log_open(struct inode *inode, struct file *file)
 {
 	return single_open(file, &skw_cp_log_show, inode->i_private);
 }
 
-
 static ssize_t skw_cp_log_write(struct file *fp, const char __user *buffer,
 		size_t len, loff_t *offset)
 {
-	char cmd[16]={0};
+	char cmd[16] = {0};
 
 	if (len >= sizeof(cmd))
 		return -EINVAL;
 	if (copy_from_user(cmd, buffer, len))
 		return -EFAULT;
 
-	if (!strncmp("enable", cmd, 6)){
+	if (!strncmp("enable", cmd, 6)) {
 		skw_usb_debug_log_open();
 		skw_usb_cp_log(0);
-	}else if (!strncmp("disable", cmd, 7)){
+	} else if (!strncmp("disable", cmd, 7)) {
 		skw_usb_debug_log_close();
 		skw_usb_cp_log(1);
 	}
@@ -240,7 +238,7 @@ static int skw_port_statistic_show(struct seq_file *seq, void *data)
 	char *statistic = kzalloc(2048, GFP_KERNEL);
 
 	skw_get_port_statistic(statistic, 2048);
-	seq_printf(seq, "Statistic:\n%s", statistic );
+	seq_printf(seq, "Statistic:\n%s", statistic);
 	kfree(statistic);
 	return 0;
 }
@@ -260,12 +258,13 @@ static const struct file_operations skw_port_statistic_fops = {
 static int skwusb_recovery_debug_show(struct seq_file *seq, void *data)
 {
 	if (skw_usb_recovery_debug_status())
-		seq_printf(seq, "Disabled");
+		seq_puts(seq, "Disabled");
 	else
-		seq_printf(seq, "Enabled");
+		seq_puts(seq, "Enabled");
 
 	return 0;
 }
+
 static int skwusb_recovery_debug_open(struct inode *inode, struct file *file)
 {
 	return single_open(file, &skwusb_recovery_debug_show, inode->i_private);
@@ -274,7 +273,7 @@ static int skwusb_recovery_debug_open(struct inode *inode, struct file *file)
 static ssize_t skwusb_recovery_debug_write(struct file *fp, const char __user *buffer,
 				size_t len, loff_t *offset)
 {
-	char cmd[16]={0};
+	char cmd[16] = {0};
 
 	if (len >= sizeof(cmd))
 		return -EINVAL;

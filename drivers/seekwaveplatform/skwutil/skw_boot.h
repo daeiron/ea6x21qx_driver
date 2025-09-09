@@ -3,7 +3,7 @@
  *Filename : skw_sdio.h
  *Authors:seekwave platform
  *
- * This software is licensed under the terms of the the GNU
+ * This software is licensed under the terms of the GNU
  * General Public License version 2, as published by the Free
  * Software Foundation, and may be copied, distributed, and
  * modified under those terms.
@@ -43,17 +43,17 @@
 #include "boot_config.h"
 
 #if KERNEL_VERSION(4, 14, 0) <= LINUX_VERSION_CODE
-        #define skw_read_file   kernel_read
-        #define skw_write_file  kernel_write
+	#define skw_read_file   kernel_read
+	#define skw_write_file  kernel_write
 #else
-        #define skw_read_file   vfs_read
-        #define skw_write_file  vfs_write
+	#define skw_read_file   vfs_read
+	#define skw_write_file  vfs_write
 #endif
 
 #if KERNEL_VERSION(5, 4, 0) <= LINUX_VERSION_CODE
-        #define skw_wakeup_source_register(x, y)        wakeup_source_register(x,y)
+        #define skw_wakeup_source_register(x, y)        wakeup_source_register(x, y)
 #else
-        #define skw_wakeup_source_register(x, y)        wakeup_source_register(y)
+	#define skw_wakeup_source_register(x, y)        wakeup_source_register(y)
 #endif
 
 #if KERNEL_VERSION(4, 4, 0) <= LINUX_VERSION_CODE
@@ -94,29 +94,28 @@
 
 #define skwboot_data_pr(level, prefix_str, prefix_type, rowsize,\
 		groupsize, buf, len, asscii)\
-		do{if(loglevel) \
+		do {if (loglevel) \
 			print_hex_dump(level, prefix_str, prefix_type, rowsize,\
 					groupsize, buf, len, asscii);\
-		}while(0)
+		} while (0)
 
 /**********************sdio boot interface start******************/
 
 #define SKW_BOOT_START_ADDR			0x100000
 #define SKW_CHIP_ID					0x40000000  //SV6160 chip id
 /*add the 32bit*4 128bit */
-struct img_head_data_t
-{
-	 unsigned int index;
-	 unsigned int dl_addr;
-	 unsigned int data_size;
-	 unsigned int write_addr;
+struct img_head_data_t {
+	unsigned int index;
+	unsigned int dl_addr;
+	unsigned int data_size;
+	unsigned int write_addr;
 };
+
 /*add the 32bit*4 128bit */
-struct img_dl_data
-{
-	 unsigned int dl_addr;
-	 unsigned int dl_info; /*type and the size*/
-	 unsigned int write_addr;
+struct img_dl_data {
+	unsigned int dl_addr;
+	unsigned int dl_info; /*type and the size*/
+	unsigned int write_addr;
 };
 
 #define CRC_16_L_SEED   0x80
@@ -139,7 +138,7 @@ struct img_dl_data
 #define SKW_SDIO_DL_POWERON_MODULE		0x164 //Poweron CP Moudle  1 WIFI 2:BT
 #define SKW_SDIO_PLD_DMA_TYPE			0x165
 #define SDIOHAL_CPLOG_TO_AP_SWITCH		0x166
-#define SKW_SDIO_CP_SLP_SWITCH  		0x167 //Turn on/off the CP slp feature 1:dis slp 0:enb slp
+#define SKW_SDIO_CP_SLP_SWITCH		0x167 //Turn on/off the CP slp feature 1:dis slp 0:enb slp
 #define SKW_SDIO_CREDIT_TO_CP			0x168
 
 // CP signal 3
@@ -158,13 +157,13 @@ struct img_dl_data
 
 #define SKWSDIO_AP2CP_IRQ				0x1b0  //AP to CP interrupt and used BIT4 set 1 :fifth bit
 
-enum dma_type_en{
-	ADMA=1,
+enum dma_type_en {
+	ADMA = 1,
 	SDMA,
 };
 
 enum skw_service_ops {
-	SKW_NO_SERVICE =0,
+	SKW_NO_SERVICE = 0,
 	SKW_WIFI_START,
 	SKW_WIFI_STOP,
 	SKW_BT_START,
@@ -233,6 +232,7 @@ struct seekwave_device {
 	unsigned int bt_antenna;
 	struct  platform_device *pdev;
 };
+
 int seekwave_boot_init(void);
 void seekwave_boot_exit(void);
 int skw_ucom_init(void);
@@ -240,15 +240,15 @@ void skw_ucom_exit(void);
 int skw_bind_boot_driver(struct device *dev);
 #define SKW_CHIP_POWEROFF(gpiono) \
 { \
-    if(gpiono >= 0) { \
-    	gpio_set_value(gpiono>>1, (gpiono&0x01)); \
+    if (gpiono >= 0) { \
+    	gpio_set_value(gpiono >> 1, (gpiono & 0x01)); \
     } \
 }
 
 #define SKW_CHIP_POWERON(gpiono) \
 { \
-    if(gpiono >= 0) { \
-  	gpio_set_value(gpiono>>1, 1-(gpiono&0x01)); \
+    if (gpiono >= 0) { \
+  	gpio_set_value(gpiono >> 1, 1 - (gpiono & 0x01)); \
     } \
 }
 #endif

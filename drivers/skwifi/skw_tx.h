@@ -52,7 +52,7 @@ struct skw_tx_desc_hdr {
 	u16 rsv:4;
 
 	/* pading for address align */
-	u8 gap[0];
+	u8 gap[];
 } __packed;
 
 struct skw_tx_desc_conf {

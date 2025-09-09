@@ -536,7 +536,6 @@ static int skw_event_rx_mgmt(struct skw_core *skw, struct skw_iface *iface,
 		break;
 	}
 
-
 	return 0;
 }
 
@@ -680,7 +679,7 @@ static int skw_event_scan_report(struct skw_core *skw, struct skw_iface *iface,
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 17, 0)
 	ts = ktime_to_timespec64(ktime_get_boottime());
-	hdr->mgmt->u.probe_resp.timestamp = ((u64)ts.tv_sec*1000000)
+	hdr->mgmt->u.probe_resp.timestamp = ((u64)ts.tv_sec * 1000000)
 						+ ts.tv_nsec / 1000;
 #else
 	hdr->mgmt->u.probe_resp.timestamp = ktime_get_boottime().tv64;
@@ -702,7 +701,6 @@ static int skw_event_scan_report(struct skw_core *skw, struct skw_iface *iface,
 	skw->nr_scan_results++;
 
 	if (test_bit(SKW_FLAG_MBSSID_PRIV, &skw->flags) && bss) {
-
 		skw_bss_priv(bss)->bssid_index = 0;
 		skw_bss_priv(bss)->max_bssid_indicator = 0;
 
@@ -858,7 +856,6 @@ static int skw_event_enter_roc(struct skw_core *skw, struct skw_iface *iface,
 	return 0;
 }
 
-
 static int skw_event_cancel_roc(struct skw_core *skw, struct skw_iface *iface,
 				void *buf, int len)
 {
@@ -897,7 +894,7 @@ static int skw_event_tdls(struct skw_core *skw, struct skw_iface *iface,
 		return -EINVAL;
 	}
 
-	length = (unsigned int) len;
+	length = (unsigned int)len;
 	skb = dev_alloc_skb(length);
 	if (!skb)
 		return -ENOMEM;
@@ -1029,7 +1026,6 @@ fail:
 }
 #endif
 
-
 void skw_cqm_scan_timeout(void *data)
 {
 	struct skw_iface *iface = data;
@@ -1129,15 +1125,15 @@ static int skw_event_cqm(struct skw_core *skw, struct skw_iface *iface,
 static int skw_trans_80211_to_8023(struct sk_buff *skb, int len)
 {
 	int ret = 0;
-	struct ieee80211_hdr *wh = (struct ieee80211_hdr *) skb->data;
-	uint32_t hdrsize;
+	struct ieee80211_hdr *wh = (struct ieee80211_hdr *)skb->data;
+	u32 hdrsize;
 	struct llc *llchdr;
 	struct ethhdr *eth_hdr;
-	uint16_t ether_type = 0;
-	uint8_t a1[ETH_ALEN];
-	uint8_t a2[ETH_ALEN];
-	uint8_t a3[ETH_ALEN];
-	uint16_t fc;
+	u16 ether_type = 0;
+	u8 a1[ETH_ALEN];
+	u8 a2[ETH_ALEN];
+	u8 a3[ETH_ALEN];
+	u16 fc;
 
 	wh = (struct ieee80211_hdr *)skb->data;
 	memcpy(a1, wh->addr1, ETH_ALEN);
@@ -1150,7 +1146,7 @@ static int skw_trans_80211_to_8023(struct sk_buff *skb, int len)
 	else
 		hdrsize = sizeof(struct ieee80211_hdr_3addr);
 
-	llchdr = (struct llc *)(((uint8_t *) skb->data) + hdrsize);
+	llchdr = (struct llc *)(((uint8_t *)skb->data) + hdrsize);
 	ether_type = llchdr->llc_un.type_snap.ether_type;
 
 	/*
@@ -1410,7 +1406,6 @@ static int skw_event_dpd_coeff_result(struct skw_core *skw,
 	skw_dpd_coeff_result_handler(skw, buf, len);
 
 	return 0;
-
 }
 
 static int skw_event_dpd_gear_cmpl(struct skw_core *skw,
@@ -1460,7 +1455,7 @@ static int skw_event_dfs_radar_pulse(struct skw_core *skw,
 {
 	int i;
 	struct skw_pulse_info info;
-	struct skw_radar_pulse * radar = buff;
+	struct skw_radar_pulse *radar = buff;
 
 #define SKW_RADAR_RSSI(r) ((r) < 0x10 ? (r) - 60 : (r) - 92)
 #define SKW_RADAR_TS(t)   ((jiffies_to_usecs(jiffies) & (~0xffffff)) | t)
@@ -1986,7 +1981,6 @@ void skw_default_event_work(struct work_struct *work)
 	skw = container_of(work, struct skw_core, event_work.work);
 
 	while ((skb = skb_dequeue(&skw->event_work.qlist))) {
-
 		msg_hdr = (struct skw_msg *)skb->data;
 		skb_pull(skb, sizeof(struct skw_msg));
 

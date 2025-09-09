@@ -13,7 +13,7 @@
 //#define CONFIG_NO_SERVICE_PD 1
 #define SKW_AP2CP_IRQ_REG 0x1B0
 
-#define	SKW_BUF_SIZE 	2048
+#define	SKW_BUF_SIZE	2048
 
 #define SKW_SDIO_SDMA	0
 #define SKW_SDIO_ADMA	1
@@ -21,28 +21,28 @@
 #define SKW_SDIO_INBAND_IRQ	0
 #define SKW_SDIO_EXTERNAL_IRQ	1
 
-#define SDIO_RX_TASK_PRIO 	90
-#define SDIO_UPDATE_TASK_PRIO 	91
+#define SDIO_RX_TASK_PRIO	90
+#define SDIO_UPDATE_TASK_PRIO	91
 
-#define SKW_SDIO_BLK_SIZE 	256
-#define MAX_PAC_SIZE 		0x700
-#define MAX2_PAC_SIZE 		0x600
+#define SKW_SDIO_BLK_SIZE	256
+#define MAX_PAC_SIZE		0x700
+#define MAX2_PAC_SIZE		0x600
 #define MAX_PAC_COUNT		72
 #define MAX_TX_PAC_SIZE     0x600
 
 #define SKW_SDIO_NSIZE_BUF_SIZE SKW_SDIO_BLK_SIZE
 
-#define SKW_SDIO_READ 		0
-#define SKW_SDIO_WRITE 		1
+#define SKW_SDIO_READ		0
+#define SKW_SDIO_WRITE		1
 
-#define SKW_SDIO_DATA_FIX 	0
-#define SKW_SDIO_DATA_INC 	1
+#define SKW_SDIO_DATA_FIX	0
+#define SKW_SDIO_DATA_INC	1
 
-#define MAX_IO_RW_BLK 		511
+#define MAX_IO_RW_BLK		511
 
-#define FUNC_0  		0
-#define FUNC_1  		1
-#define MAX_FUNC_NUM 		2
+#define FUNC_0		0
+#define FUNC_1		1
+#define MAX_FUNC_NUM		2
 
 #define SKW_SDIO_DT_MODE_ADDR	0x0f
 #define SKW_SDIO_PK_MODE_ADDR	0x20
@@ -54,27 +54,26 @@
 
 #define SKW_SDIO_FBR_REG		0x15C
 
-#define SKW_CHIP_ID0		0x40000000  	//SV6160 chip id0
-#define SKW_CHIP_ID1		0x40000004  	//SV6160 chip id1
-#define SKW_CHIP_ID2		0x40000008  	//SV6160 chip id2
-#define SKW_CHIP_ID3		0x4000000C  	//SV6160 chip id3
-#define SKW_CHIP_ID_LENGTH	16  		//SV6160 chip id lenght
+#define SKW_CHIP_ID0		0x40000000	//SV6160 chip id0
+#define SKW_CHIP_ID1		0x40000004	//SV6160 chip id1
+#define SKW_CHIP_ID2		0x40000008	//SV6160 chip id2
+#define SKW_CHIP_ID3		0x4000000C	//SV6160 chip id3
+#define SKW_CHIP_ID_LENGTH	16		//SV6160 chip id lenght
 #define SKW_BT_CONFIG_ADDR	0x2023FFF0	//SV6160 BT boot configuration
 #define SDIO_WIFI_POWERON_REG   0x40104000
 
-#define SKW_SDIO_ALIGN_4BYTE(a)  (((a)+3)&(~3))
-#define SKW_SDIO_ALIGN_BLK(a) (((a)%SKW_SDIO_BLK_SIZE) ? \
-	(((a)/SKW_SDIO_BLK_SIZE + 1)*SKW_SDIO_BLK_SIZE) : (a))
+#define SKW_SDIO_ALIGN_4BYTE(a)  (((a) + 3) & (~3))
+#define SKW_SDIO_ALIGN_BLK(a) (((a) % SKW_SDIO_BLK_SIZE) ? \
+	(((a) / SKW_SDIO_BLK_SIZE + 1) * SKW_SDIO_BLK_SIZE) : (a))
 
 #define SDIO_VER_CCCR	(0)
-
 
 #define SKW_SDIO_CARD_OFFLINE 0x8000
 #define SKW_CARD_ONLINE(skw_sdio) \
 	(atomic_read(&skw_sdio->online) < SKW_SDIO_CARD_OFFLINE)
 
 #define SKW_SDIO_RESET_CARD_VAL 0x08
-#define SKW_SDIO_RESET_CP 	0x20
+#define SKW_SDIO_RESET_CP	0x20
 
 #define	WIFI_SERVICE	0
 #define	BT_SERVICE	1
@@ -84,7 +83,6 @@
 
 #define	SKW_SDIO_V10 0
 #define	SKW_SDIO_V20 1
-
 
 #define	WIFI_CMD_PORT	5
 #define	WIFI_DATA_PORT	6
@@ -107,7 +105,7 @@ struct skw_sdio_data_t {
 	struct completion rx_completed;
 	struct task_struct *update_thread;
 	struct completion update_completed;
-#ifdef  CONFIG_WAKELOCK
+#ifdef CONFIG_WAKELOCK
 	struct wake_lock rx_wl;
 #else
 	struct wakeup_source *rx_ws;
@@ -176,6 +174,7 @@ struct debug_vars {
 	u64 last_clear_irq_times[CHN_IRQ_RECORD_NUM];
 	u64 last_rx_read_times[CHN_IRQ_RECORD_NUM];
 };
+
 void skw_resume_check(void);
 struct skw_sdio_data_t *skw_sdio_get_data(void);
 
@@ -196,13 +195,13 @@ int skw_sdio_writel(unsigned int address, void *data);
 int skw_sdio_readl(unsigned int address, void *data);
 int send_modem_service_command(u16 service, u16 command);
 int send_modem_assert_command(void);
-int skw_sdio_bind_platform_driver(struct sdio_func * func);
-int skw_sdio_bind_WIFI_driver(struct sdio_func * func);
-int skw_sdio_bind_BT_driver(struct sdio_func * func);
-int skw_sdio_bind_btseekwave_driver(struct sdio_func * func);
+int skw_sdio_bind_platform_driver(struct sdio_func *func);
+int skw_sdio_bind_WIFI_driver(struct sdio_func *func);
+int skw_sdio_bind_BT_driver(struct sdio_func *func);
+int skw_sdio_bind_btseekwave_driver(struct sdio_func *func);
 int skw_sdio_unbind_platform_driver(struct sdio_func *func);
-int skw_sdio_unbind_WIFI_driver(struct sdio_func * func);
-int skw_sdio_unbind_BT_driver(struct sdio_func * func);
+int skw_sdio_unbind_WIFI_driver(struct sdio_func *func);
+int skw_sdio_unbind_BT_driver(struct sdio_func *func);
 int skw_boot_loader(struct seekwave_device *boot_data);
 void send_host_suspend_indication(struct skw_sdio_data_t *skw_sdio);
 void send_host_resume_indication(struct skw_sdio_data_t *skw_sdio);
@@ -233,8 +232,8 @@ int skw_sdio_debug_log_close(void);
 
 #define skwsdio_data_pr(level, prefix_str, prefix_type, rowsize,\
 		groupsize, buf, len, asscii)\
-		do{if(loglevel) \
+		do {if (loglevel) \
 			print_hex_dump(level, prefix_str, prefix_type, rowsize,\
 					groupsize, buf, len, asscii);\
-		}while(0)
+		} while (0)
 #endif

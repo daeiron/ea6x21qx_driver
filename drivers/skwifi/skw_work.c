@@ -172,7 +172,6 @@ static void skw_work(struct work_struct *work)
 	struct wiphy *wiphy = priv_to_wiphy(skw);
 
 	while (skw->work_data.flags || skb_queue_len(&skw->work_data.work_list)) {
-
 		if (test_bit(SKW_WORK_FLAG_RCU_FREE, &skw->work_data.flags)) {
 			struct rcu_head *head;
 

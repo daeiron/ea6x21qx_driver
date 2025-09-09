@@ -146,7 +146,7 @@ struct skw_template {
 	u16 head_len;
 	u16 tail_ofsset;
 	u16 tail_len;
-	struct ieee80211_mgmt mgmt[0];
+	struct ieee80211_mgmt mgmt[];
 };
 
 struct skw_rate {
@@ -182,7 +182,7 @@ struct skw_element {
 struct skw_tlv {
 	u16 type;
 	u16 len;
-	char value[0];
+	char value[];
 };
 
 struct skw_tlv_conf {

@@ -3,7 +3,7 @@
  *Filename : skw_sdio.h
  *Authors:seekwave platform
  *
- * This software is licensed under the terms of the the GNU
+ * This software is licensed under the terms of the GNU
  * General Public License version 2, as published by the Free
  * Software Foundation, and may be copied, distributed, and
  * modified under those terms.
@@ -38,7 +38,6 @@
 
 #define skwlog_err(fmt, args...) \
     pr_err("[SKWLOG_ERR]:" fmt, ## args)
-
 
 int skw_modem_log_init(struct sv6160_platform_data *p_data, struct file *fp, void *ucom);
 void skw_modem_log_set_assert_status(uint32_t cp_assert);

@@ -566,6 +566,7 @@ static inline void skw_peer_ctx_unlock(struct skw_peer_ctx *ctx)
 
 	mutex_unlock(&ctx->lock);
 }
+
 #if 0
 static inline void skw_sta_lock(struct skw_sta_core *core)
 {

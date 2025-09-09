@@ -86,7 +86,7 @@ unsigned long skw_log_level(void);
 #define skw_hex_dump(prefix, buf, len, force)                                    \
 	do {                                                                     \
 		if ((skw_log_level() & SKW_DUMP) || force) {                     \
-			print_hex_dump(KERN_ERR, "["SKW_TAG_DUMP"] "prefix" - ", \
+			print_hex_dump(KERN_ERR, "[" SKW_TAG_DUMP "] " prefix " - ", \
 				DUMP_PREFIX_OFFSET, 16, 1, buf, len, true);      \
 		}                                                                \
 	} while (0)

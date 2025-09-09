@@ -62,7 +62,6 @@ static inline int skw_ap_send_deauth(struct skw_iface *iface,
 					IEEE80211_STYPE_DEAUTH, reason);
 }
 
-
 static inline int skw_ap_send_disassoc(struct skw_iface *iface,
 				       struct skw_client *client, u16 code)
 {

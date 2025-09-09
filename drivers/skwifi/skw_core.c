@@ -1077,6 +1077,7 @@ static void skw_ndo_set_rx_mode(struct net_device *dev)
 
 	SKW_KFREE(mc);
 }
+
 #if 0
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 11, 0)
 static struct rtnl_link_stats64 *
@@ -1345,7 +1346,6 @@ int skw_sync_cmd_event_version(struct wiphy *wiphy)
 	SKW_KFREE(skw_fw_ver);
 
 	return ret;
-
 }
 
 static int skw_set_capa(struct skw_core *skw, int capa)
@@ -1545,7 +1545,6 @@ static void skw_setup_mac_address(struct wiphy *wiphy, u8 *user_mac, u8 *hw_mac)
 #ifdef CONFIG_SKW_RANDOM_MAC_FIXED_TO_EFUSE
 		skw_save_random_mac_to_efuse(wiphy, addr);
 #endif
-
 	}
 
 	for (i = 0; i < SKW_NR_IFACE; i++) {
@@ -1701,7 +1700,6 @@ static void skw_hw_info_init(struct skw_core *skw, struct sv6160_platform_data *
 		if (skw_port[1].logic_port) {
 			skw_port[1].flags = SKW_LMAC_FLAG_INIT |
 					    SKW_LMAC_FLAG_RXCB;
-
 		}
 
 		break;
@@ -1938,7 +1936,7 @@ void skw_set_ip_to_fw(struct wiphy *wiphy, struct net_device *ndev)
 	struct inet6_dev *idev;
 	struct inet6_ifaddr *ifp;
 
-	struct skw_setip_param setip_param[SKW_FW_IPV6_COUNT_LIMIT+1];
+	struct skw_setip_param setip_param[SKW_FW_IPV6_COUNT_LIMIT + 1];
 	int ip_count = 0, ipv6_count = 0;
 
 	in_dev = __in_dev_get_rtnl(ndev);
@@ -1978,8 +1976,7 @@ ipv6:
 
 ip_apply:
 	if (ip_count)
-		skw_set_ip(wiphy, ndev, setip_param, ip_count*sizeof(struct skw_setip_param));
-
+		skw_set_ip(wiphy, ndev, setip_param, ip_count * sizeof(struct skw_setip_param));
 }
 
 #ifdef CONFIG_INET

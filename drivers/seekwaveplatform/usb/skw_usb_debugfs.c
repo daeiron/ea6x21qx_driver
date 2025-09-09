@@ -35,7 +35,7 @@ static const struct file_operations skw_usb_state_fops = {
 struct dentry *skw_usb_add_debugfs(const char *name, umode_t mode, void *data,
 			       const struct file_operations *fops)
 {
-	skw_usb_dbg("%s:name: %s\n",__func__,name);
+	skw_usb_dbg("%s:name: %s\n", __func__, name);
 
 	return debugfs_create_file(name, mode, skw_usb_root_dir, data, fops);
 }

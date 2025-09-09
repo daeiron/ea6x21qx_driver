@@ -93,7 +93,7 @@ struct skw_pulse_data {
 struct skw_radar_pulse {
 	u8 nr_pulse;
 	u8 resv;
-	struct skw_pulse_data data[0];
+	struct skw_pulse_data data[];
 } __packed;
 
 struct skw_pulse_info {
@@ -165,6 +165,7 @@ static inline int skw_dfs_stop_monitor(struct wiphy *wiphy, struct net_device *d
 {
 	return 0;
 }
+
 static inline int skw_dfs_init(struct wiphy *wiphy, struct net_device *dev)
 {
 	return 0;

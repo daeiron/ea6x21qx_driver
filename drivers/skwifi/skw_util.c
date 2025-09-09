@@ -26,20 +26,19 @@
 #include <clocksource/arm_arch_timer.h>
 u64 skw_local_clock(void)
 {
-        u64 ns;
+	u64 ns;
 
-        ns = arch_timer_read_counter() * 1000;
-        do_div(ns, 24);
+	ns = arch_timer_read_counter() * 1000;
+	do_div(ns, 24);
 
-        return ns;
+	return ns;
 }
 #else
 u64 skw_local_clock(void)
 {
-        return local_clock();
+	return local_clock();
 }
 #endif
-
 
 #ifdef SKW_IMPORT_NS
 struct file *skw_file_open(const char *path, int flags, int mode)
@@ -296,7 +295,6 @@ int skw_tx_throughput(struct skw_iface *iface, u8 *mac)
 	int ret = 0;
 	struct skw_peer_ctx *ctx;
 
-
 	if (!iface) {
 		ret = -ENOENT;
 		goto exit;
@@ -328,7 +326,6 @@ int skw_rx_throughput(struct skw_iface *iface, u8 *mac)
 {
 	int ret = 0;
 	struct skw_peer_ctx *ctx;
-
 
 	if (!iface) {
 		ret = -ENOENT;
@@ -363,7 +360,6 @@ int skw_tx_throughput_whole(struct skw_iface *iface, u32 *tp)
 	u32 peer_idx_map, idx;
 	struct skw_peer_ctx *ctx;
 
-
 	if (!iface) {
 		ret = -ENOENT;
 		goto exit;
@@ -380,7 +376,7 @@ int skw_tx_throughput_whole(struct skw_iface *iface, u32 *tp)
 		skw_peer_ctx_lock(ctx);
 
 		if (ctx->peer)
-			*(&(tp[idx])) = skw_peer_rate(&ctx->peer->tx);
+			*(&tp[idx]) = skw_peer_rate(&ctx->peer->tx);
 
 		skw_peer_ctx_unlock(ctx);
 	}
@@ -395,7 +391,6 @@ int skw_rx_throughput_whole(struct skw_iface *iface, u32 *tp)
 	u32 peer_idx_map, idx;
 	struct skw_peer_ctx *ctx;
 
-
 	if (!iface) {
 		ret = -ENOENT;
 		goto exit;
@@ -412,7 +407,7 @@ int skw_rx_throughput_whole(struct skw_iface *iface, u32 *tp)
 		skw_peer_ctx_lock(ctx);
 
 		if (ctx->peer)
-			*(&(tp[idx])) = skw_peer_rate(&ctx->peer->rx);
+			*(&tp[idx]) = skw_peer_rate(&ctx->peer->rx);
 
 		skw_peer_ctx_unlock(ctx);
 	}

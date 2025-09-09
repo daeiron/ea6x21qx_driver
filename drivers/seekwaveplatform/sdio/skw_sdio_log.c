@@ -172,16 +172,17 @@ static const struct file_operations skw_sdio_log_fops = {
 	.release = single_release,
 	.write = skw_sdio_log_write,
 };
+
 static int skw_version_show(struct seq_file *seq, void *data)
 {
-	seq_printf(seq, "firmware info: %s\n", firmware_version );
+	seq_printf(seq, "firmware info: %s\n", firmware_version);
 	return 0;
 }
+
 static int skw_version_open(struct inode *inode, struct file *file)
 {
 	return single_open(file, &skw_version_show, inode->i_private);
 }
-
 
 static const struct file_operations skw_version_fops = {
 	.owner = THIS_MODULE,
@@ -192,57 +193,57 @@ static const struct file_operations skw_version_fops = {
 
 static int skw_port_statistic_show(struct seq_file *seq, void *data)
 {
-        char *statistic = kzalloc(2048, GFP_KERNEL);
+	char *statistic = kzalloc(2048, GFP_KERNEL);
 
-        skw_get_port_statistic(statistic, 2048);
+	skw_get_port_statistic(statistic, 2048);
 	seq_printf(seq, "Statistic:\n %s\n", statistic);
 	skw_get_assert_print_info(statistic, 2048);
 	seq_printf(seq, "sdio last irqs information:\n%s", statistic);
 	skw_get_sdio_debug_info(statistic, 2048);
 	seq_printf(seq, "\nsdio debug information:\n%s", statistic);
 	kfree(statistic);
-        return 0;
+	return 0;
 }
+
 static int skw_port_statistic_open(struct inode *inode, struct file *file)
 {
-        return single_open(file, &skw_port_statistic_show, inode->i_private);
+	return single_open(file, &skw_port_statistic_show, inode->i_private);
 }
 
-
 static const struct file_operations skw_port_statistic_fops = {
-        .owner = THIS_MODULE,
-        .open = skw_port_statistic_open,
-        .read = seq_read,
-        .release = single_release,
+	.owner = THIS_MODULE,
+	.open = skw_port_statistic_open,
+	.read = seq_read,
+	.release = single_release,
 };
 
 static int skw_cp_log_show(struct seq_file *seq, void *data)
 {
 	if (!skw_sdio_cp_log_status())
-		seq_printf(seq, "Enabled");
+		seq_puts(seq, "Enabled");
 	else
-		seq_printf(seq, "Disabled");
-        return 0;
-}
-static int skw_cp_log_open(struct inode *inode, struct file *file)
-{
-        return single_open(file, &skw_cp_log_show, inode->i_private);
+		seq_puts(seq, "Disabled");
+	return 0;
 }
 
+static int skw_cp_log_open(struct inode *inode, struct file *file)
+{
+	return single_open(file, &skw_cp_log_show, inode->i_private);
+}
 
 static ssize_t skw_cp_log_write(struct file *fp, const char __user *buffer,
 				size_t len, loff_t *offset)
 {
-	char cmd[16]={0};
+	char cmd[16] = {0};
 
 	if (len >= sizeof(cmd))
 		return -EINVAL;
 	if (copy_from_user(cmd, buffer, len))
 		return -EFAULT;
-	if (!strncmp("enable", cmd, 6)){
+	if (!strncmp("enable", cmd, 6)) {
 		skw_sdio_debug_log_open();
 		skw_sdio_cp_log(0);
-	}else if (!strncmp("disable", cmd, 7)){
+	} else if (!strncmp("disable", cmd, 7)) {
 		skw_sdio_debug_log_close();
 		skw_sdio_cp_log(1);
 	}
@@ -261,21 +262,21 @@ static const struct file_operations skw_cp_log_fops = {
 static int skw_recovery_debug_show(struct seq_file *seq, void *data)
 {
 	if (skw_sdio_recovery_debug_status())
-		seq_printf(seq, "Disabled");
+		seq_puts(seq, "Disabled");
 	else
-		seq_printf(seq, "Enabled");
-        return 0;
-}
-static int skw_recovery_debug_open(struct inode *inode, struct file *file)
-{
-        return single_open(file, &skw_recovery_debug_show, inode->i_private);
+		seq_puts(seq, "Enabled");
+	return 0;
 }
 
+static int skw_recovery_debug_open(struct inode *inode, struct file *file)
+{
+	return single_open(file, &skw_recovery_debug_show, inode->i_private);
+}
 
 static ssize_t skw_recovery_debug_write(struct file *fp, const char __user *buffer,
 				size_t len, loff_t *offset)
 {
-	char cmd[16]={0};
+	char cmd[16] = {0};
 
 	if (len >= sizeof(cmd))
 		return -EINVAL;
@@ -289,7 +290,6 @@ static ssize_t skw_recovery_debug_write(struct file *fp, const char __user *buff
 	return len;
 }
 
-
 static const struct file_operations skw_recovery_debug_fops = {
 	.owner = THIS_MODULE,
 	.open = skw_recovery_debug_open,
@@ -298,21 +298,20 @@ static const struct file_operations skw_recovery_debug_fops = {
 	.write = skw_recovery_debug_write,
 };
 
-
 static int skw_dumpmem_show(struct seq_file *seq, void *data)
 {
-        return 0;
-}
-static int skw_dumpmem_open(struct inode *inode, struct file *file)
-{
-        return single_open(file, &skw_dumpmem_show, inode->i_private);
+	return 0;
 }
 
+static int skw_dumpmem_open(struct inode *inode, struct file *file)
+{
+	return single_open(file, &skw_dumpmem_show, inode->i_private);
+}
 
 static ssize_t skw_dumpmem_write(struct file *fp, const char __user *buffer,
 				size_t len, loff_t *offset)
 {
-	char cmd[16]={0};
+	char cmd[16] = {0};
 
 	if (len >= sizeof(cmd))
 		return -EINVAL;
@@ -337,21 +336,21 @@ static const struct file_operations skw_dumpmem_fops = {
 static int skw_sdio_wifi_show(struct seq_file *seq, void *data)
 {
 	if (skw_sdio_wifi_status())
-		seq_printf(seq, "PowerOn");
+		seq_puts(seq, "PowerOn");
 	else
-		seq_printf(seq, "PowerOff");
-        return 0;
-}
-static int skw_sdio_wifi_open(struct inode *inode, struct file *file)
-{
-        return single_open(file, &skw_sdio_wifi_show, inode->i_private);
+		seq_puts(seq, "PowerOff");
+	return 0;
 }
 
+static int skw_sdio_wifi_open(struct inode *inode, struct file *file)
+{
+	return single_open(file, &skw_sdio_wifi_show, inode->i_private);
+}
 
 static ssize_t skw_sdio_wifi_poweron(struct file *fp, const char __user *buffer,
 				size_t len, loff_t *offset)
 {
-	char cmd[16]={0};
+	char cmd[16] = {0};
 
 	if (len >= sizeof(cmd))
 		return -EINVAL;

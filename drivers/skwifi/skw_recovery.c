@@ -132,7 +132,6 @@ skw_recovery_sap_flush_sta(struct wiphy *wiphy, struct skw_recovery_data *rd,
 	u32 peer_map = rd->iface[iface->id].peer_map;
 
 	while (peer_map) {
-
 		if (test_bit(SKW_FLAG_FW_ASSERT, &skw->flags))
 			break;
 
