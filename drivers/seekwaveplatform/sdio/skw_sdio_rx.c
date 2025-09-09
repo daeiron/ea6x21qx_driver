@@ -619,8 +619,6 @@ static int skw_sdio_handle_packet(struct skw_sdio_data_t *skw_sdio,
 			sg_set_buf(&port->sg_rx[port->sg_index++], header, header->len + 4);
 		}
 	} else {
-		int packet = 0, total = 0;
-
 		mutex_lock(&port->rx_mutex);
 		buf_size = (port->length + port->rx_wp - port->rx_rp) % port->length;
 		buf_size = port->length - 1 - buf_size;
@@ -636,6 +634,7 @@ static int skw_sdio_handle_packet(struct skw_sdio_data_t *skw_sdio,
 			return 0;
 		}
 		if (header->len > 12) {
+			int packet = 0, total = 0;
 			port->next_seqno++;
 			addr += 12;
 			header->len -= 12;
@@ -809,8 +808,6 @@ static int skw_sdio2_handle_packet(struct skw_sdio_data_t *skw_sdio,
 			sg_set_buf(&port->sg_rx[port->sg_index++], header, header->len + 4);
 		}
 	} else {
-		int packet = 0, total = 0;
-
 		mutex_lock(&port->rx_mutex);
 		buf_size = (port->length + port->rx_wp - port->rx_rp) % port->length;
 		buf_size = port->length - 1 - buf_size;
@@ -825,6 +822,7 @@ static int skw_sdio2_handle_packet(struct skw_sdio_data_t *skw_sdio,
 			return 0;
 		}
 		if (header->len > 12) {
+			int packet = 0, total = 0;
 			port->next_seqno++;
 			addr += 12;
 			header->len -= 12;
@@ -930,8 +928,7 @@ static int skw_sdio_adma_parser(struct skw_sdio_data_t *skw_sdio, struct scatter
 		if (!header->eof && (channel < max_ch_num) && header->len) {
 			parse_len += header->len;
 			data = (uint32_t *)(header + 1);
-			if ((channel >= max_ch_num) || (header->len >
-				(MAX_PAC_SIZE - sizeof(struct skw_packet_header))) ||
+			if ((header->len > (MAX_PAC_SIZE - sizeof(struct skw_packet_header))) ||
 				(header->len == 0)) {
 				skw_sdio_err("%s invalid header[%d]len[%d]: 0x%x 0x%x\n",
 						__func__,  header->channel, header->len, data[0], data[1]);
@@ -986,8 +983,7 @@ static int skw_sdio2_adma_parser(struct skw_sdio_data_t *skw_sdio, struct scatte
 		if (!header->eof && (channel < max_ch_num) && header->len) {
 			parse_len += header->len;
 			data = (uint32_t *)(header + 1);
-			if ((channel >= max_ch_num) || (header->len >
-				(MAX_PAC_SIZE - sizeof(struct skw_packet2_header))) ||
+			if ((header->len > (MAX_PAC_SIZE - sizeof(struct skw_packet2_header))) ||
 				(header->len == 0)) {
 				skw_sdio_err("%s invalid header[%d]len[%d]: 0x%x 0x%x\n",
 						__func__,  header->channel, header->len, data[0], data[1]);
@@ -1161,8 +1157,8 @@ int skw_sdio_rx_thread(void *p)
 	unsigned int valid_len = 0;
 	char *rx_buf;
 	struct scatterlist *sgs = NULL;
-	char fifo_ind;
-  unsigned char reg = 0;
+	char fifo_ind_local;
+	char reg = 0;
 
 	skw_sdio_sdma_set_nsize(0);
 	skw_sdio_adma_set_packet_num(1);
@@ -1188,31 +1184,31 @@ int skw_sdio_rx_thread(void *p)
 			int value = gpio_get_value(skw_sdio->gpio_in);
 
 			if (value == 0) {
-				ret = skw_sdio_readb(SKW_SDIO_CP2AP_FIFO_IND, &fifo_ind);
+				ret = skw_sdio_readb(SKW_SDIO_CP2AP_FIFO_IND, &fifo_ind_local);
 				if (ret) {
 					skw_sdio_err("line %d sdio cmd52 read fail ret:%d\n", __LINE__, ret);
 					skw_sdio_unlock_rx_ws(skw_sdio);
 					continue;
 				}
 			}
-			ret = skw_sdio_readb(SKW_SDIO_CP2AP_FIFO_IND, &fifo_ind);
+			ret = skw_sdio_readb(SKW_SDIO_CP2AP_FIFO_IND, &fifo_ind_local);
 			if (ret) {
 				skw_sdio_err("line %d sdio cmd52 read fail ret:%d\n", __LINE__, ret);
 				skw_sdio_unlock_rx_ws(skw_sdio);
 				continue;
 			}
 			skw_sdio_dbg("line:%d cp fifo status(%d,%d) ret=%d\n",
-					__LINE__, fifo_ind, cp_fifo_status, ret);
-			if (!ret && !fifo_ind)
+					__LINE__, fifo_ind_local, cp_fifo_status, ret);
+			if (!ret && !fifo_ind_local)
 				skw_sdio_dbg("cp fifo ret -- %d\n", ret);
-			if (fifo_ind == cp_fifo_status) {
+			if (fifo_ind_local == cp_fifo_status) {
 				skw_sdio_info("line:%d cp fifo status(%d,%d) ret=%d\n",
-						__LINE__, fifo_ind, cp_fifo_status, ret);
+						__LINE__, fifo_ind_local, cp_fifo_status, ret);
 				skw_sdio_unlock_rx_ws(skw_sdio);
 				continue;
 			}
 		}
-		cp_fifo_status = fifo_ind;
+		cp_fifo_status = fifo_ind_local;
 receive_again:
 		if (skw_sdio->adma_rx_enable) {
 			int	nsize_offset;
@@ -1475,7 +1471,6 @@ int try_to_wakeup_modem(int portno)
 	if (val && !skw_sdio->sdio_func[FUNC_1]->irq_handler &&
 		!skw_sdio->resume_com && skw_sdio->irq_type == SKW_SDIO_INBAND_IRQ) {
 		sdio_claim_host(skw_sdio->sdio_func[FUNC_1]);
-		ret = sdio_claim_irq(skw_sdio->sdio_func[FUNC_1], skw_sdio_inband_irq_handler);
 		ret = skw_sdio_enable_async_irq();
 		if (ret < 0)
 			skw_sdio_err("enable sdio async irq fail ret = %d\n", ret);
