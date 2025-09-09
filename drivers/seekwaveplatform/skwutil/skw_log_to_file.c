@@ -136,15 +136,14 @@ char *skw_btem_mem = "btem_mem_41022000_c000";
 
 int modem_event_notifier(struct notifier_block *nb, unsigned long action, void *data)
 {
-	unsigned long flags;
-	int ret = 0;
-
 	skwboot_log("%s event = %d\n", __func__, (int)action);
 	switch (action)
 	{
 		case DEVICE_ASSERT_EVENT:
 		{
 			struct log_com_dev *ucom = log_com;
+			unsigned long flags;
+			int ret = 0;
 
 			skwboot_log("the BSPASSERT EVENT Comming in !!!!\n");
 			skw_modem_log_start_rec();
