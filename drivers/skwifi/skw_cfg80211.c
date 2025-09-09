@@ -4641,14 +4641,17 @@ static int skw_dump_survey(struct wiphy *wiphy, struct net_device *ndev,
 
 	skw_detail("%s, idx: %d\n", netdev_name(ndev), idx);
 
+	mutex_lock(&iface->survey_lock);
 	sinfo = list_first_entry_or_null(&iface->survey_list,
 					 struct skw_survey_info, list);
 	if (!sinfo) {
+		mutex_unlock(&iface->survey_lock);
 		skw_dbg("last idx: %d\n", idx);
 		return -EINVAL;
 	}
 
 	list_del(&sinfo->list);
+	mutex_unlock(&iface->survey_lock);
 
 	freq = skw_to_freq(sinfo->data.chan);
 	info->noise = sinfo->data.noise;
@@ -4789,7 +4792,9 @@ static int skw_start_radar_detection(struct wiphy *wiphy, struct net_device *dev
 
 	ret = skw_dfs_start_cac(wiphy, dev);
 	if (!ret) {
+		spin_lock(&iface->sap.dfs.flags_lock);
 		set_bit(SKW_DFS_FLAG_CAC_MODE, &iface->sap.dfs.flags);
+		spin_unlock(&iface->sap.dfs.flags_lock);
 		queue_delayed_work(skw->event_wq, &iface->sap.dfs.cac_work,
 				msecs_to_jiffies(cac_time_ms));
 	}
