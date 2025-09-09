@@ -113,7 +113,7 @@ static bool skw_timer_id_exist(struct skw_core *skw, void *id)
 	spin_lock_bh(&skw->timer_data.lock);
 
 	list_for_each_entry(timer, &skw->timer_data.list, list) {
-		if (timer->id && timer->id == id) {
+		if (id == timer->id) {
 			result = true;
 			break;
 		}
@@ -186,7 +186,7 @@ void skw_del_timer_work(struct skw_core *skw, void *timer_id)
 
 	spin_lock_bh(&skw->timer_data.lock);
 	list_for_each_entry(timer, &skw->timer_data.list, list) {
-		if (timer->id && timer->id == timer_id) {
+		if (timer->id == timer_id) {
 			list_del(&timer->list);
 			skw->timer_data.count--;
 			SKW_KFREE(timer);
