@@ -147,7 +147,7 @@ static int skw_dpd_cali_download(struct wiphy *wiphy,
 		goto relese_ilc;
 	}
 
-	*(u32 *)(skw->dpd.resource + SKW_DPD_RESOURCE_DATA_CNT) =
+	*(u32 *)((u8 *)skw->dpd.resource + SKW_DPD_RESOURCE_DATA_CNT) =
 		crc32c(0, skw->dpd.resource, SKW_DPD_RESOURCE_DATA_CNT);
 
 	ret = skw_file_write(fp, skw->dpd.resource, skw->dpd.size, 0);
@@ -206,7 +206,7 @@ static int skw_dpd_load_resource(struct skw_dpd *dpd, const char *path)
 	if (ret < 0)
 		goto out;
 
-	if (*(u32 *)(dpd->resource + SKW_DPD_RESOURCE_DATA_CNT)
+	if (*(u32 *)((u8 *)dpd->resource + SKW_DPD_RESOURCE_DATA_CNT)
 		!= crc32c(0, dpd->resource, SKW_DPD_RESOURCE_DATA_CNT)) {
 		ret = -SKW_EDPDVRFY;
 		skw_err("resource crc:%d fail", ret);
