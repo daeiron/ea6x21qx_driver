@@ -24,7 +24,6 @@
 #include <linux/of_gpio.h>
 #include <linux/completion.h>
 #include <linux/moduleparam.h>
-#include <linux/workqueue.h>
 #include <linux/of.h>
 #include <linux/device.h>
 #include <linux/version.h>
