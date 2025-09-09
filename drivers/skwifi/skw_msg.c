@@ -1680,7 +1680,7 @@ static int skw_set_cmd(struct skw_core *skw, int dev_id, int cmd,
 {
 	struct skw_msg *msg_hdr;
 	int total_len, msg_len;
-	void *pos;
+	u8 *pos;
 
 	// lockdep_assert_held(&skw->cmd.lock.lock);
 	pos = skw->cmd.data;
@@ -1712,7 +1712,7 @@ static int skw_set_cmd(struct skw_core *skw, int dev_id, int cmd,
 	skw->cmd.data_len = total_len;
 	WRITE_ONCE(skw->cmd.flags, extra_flags);
 
-	msg_hdr = pos;
+	msg_hdr = (struct skw_msg *) pos;
 	msg_hdr->inst_id = dev_id;
 	msg_hdr->type = SKW_MSG_CMD;
 	msg_hdr->id = cmd;
@@ -1927,7 +1927,7 @@ int skw_cmd_ack_handler(struct skw_core *skw, void *data, int data_len)
 			skw_warn("%s expect len: %d, recv len: %d\n",
 				 skw->cmd.name, skw->cmd.arg_size, len);
 
-		memcpy(skw->cmd.arg, data + hdr_len,
+		memcpy(skw->cmd.arg, (u8 *)data + hdr_len,
 		       min(data_len - hdr_len, (int)skw->cmd.arg_size));
 	}
 
