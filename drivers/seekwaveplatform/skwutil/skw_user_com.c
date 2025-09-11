@@ -496,7 +496,7 @@ static int skw_ucom_remove(struct platform_device *pdev)
 	struct sv6160_platform_data *pdata = dev->platform_data;
 	struct ucom_dev *ucom;
 	int ret, i;
-	unsigned long  devno;
+	unsigned long devno;
 
 	ucom = platform_get_drvdata(pdev);
 	if (ucom && ucom->pdata) {
