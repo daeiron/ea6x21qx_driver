@@ -3070,6 +3070,8 @@ static int skw_assoc(struct wiphy *wiphy, struct net_device *dev,
 	core->assoc_req_ie_len = 0;
 	memset(core->assoc_req_ie, 0x0, SKW_2K_SIZE);
 
+	mutex_lock(&core->lock);
+
 	skw_set_state(&core->sm, SKW_STATE_ASSOCING);
 
 	skw_set_sta_timer(core, SKW_STEP_TIMEOUT);
@@ -3088,6 +3090,8 @@ static int skw_assoc(struct wiphy *wiphy, struct net_device *dev,
 		memset(core->bss.ssid, 0x0, IEEE80211_MAX_SSID_LEN);
 		core->bss.ssid_len = 0;
 	}
+
+	mutex_unlock(&core->lock);
 
 	return ret;
 }
