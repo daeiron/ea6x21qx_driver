@@ -195,41 +195,55 @@ static void skw_csum_verify(struct skw_rx_desc *desc, struct sk_buff *skb)
 	struct iphdr *iph;
 	struct ipv6hdr *ip6h;
 	struct ethhdr *eth = eth_hdr(skb);
+	int exthdr_len = 0;
+	u8 nexthdr;
 
 	if (!skb->csum)
 		return;
 
-	switch (eth->h_proto) {
+	switch (eth->h_proto)
+	{
 	case htons(ETH_P_IPV6):
 		ip6h = (struct ipv6hdr *)(skb->data);
 		tcphoff = sizeof(struct ipv6hdr);
-		// tcph = (struct tcphdr *)(skb->data + tcphoff);
+		nexthdr = ip6h->nexthdr;
 
-		// fixme:
-		// minus the length of any extension headers present between the IPv6
-		// header and the upper-layer header
-		data_len = ntohs(ip6h->payload_len);
+		// Parse IPv6 extension headers to find the upper-layer protocol
+		if (nexthdr != IPPROTO_TCP && nexthdr != IPPROTO_UDP)
+		{
+			int offset = ipv6_skip_exthdr(skb, tcphoff, &nexthdr, NULL);
+			if (offset < 0 || offset >= skb->len)
+			{
+				skw_detail("invalid IPv6 extension headers, skipping csum verify\n");
+				return;
+			}
+			exthdr_len = offset - tcphoff;
+			tcphoff = offset; // Update to point to upper-layer header
+		}
 
-		if (skb->len != data_len + tcphoff) {
+		data_len = ntohs(ip6h->payload_len) - exthdr_len; // Exclude extension headers
+
+		if (skb->len != data_len + tcphoff)
+		{
 			skw_detail("ipv6 dummy pending: rx len: %d, tot_len: %d",
-				   skb->len, data_len);
+					   skb->len, data_len + tcphoff);
 
-			skb->csum = csum_partial(skb->data + tcphoff,
-						data_len, 0);
-
+			skb->csum = csum_partial(skb->data + tcphoff, data_len, 0);
 			skb_trim(skb, data_len + tcphoff);
 		}
 
 		csum = csum_ipv6_magic(&ip6h->saddr, &ip6h->daddr, data_len,
-					ip6h->nexthdr, skb->csum);
-		if (csum) {
+							   nexthdr, skb->csum);
+		if (csum)
+		{
 			skw_detail("sa: %pI6, da: %pI6, proto: 0x%x, seq: %d, csum: 0x%x, result: 0x%x\n",
-				&ip6h->saddr, &ip6h->daddr, ip6h->nexthdr,
-				desc->sn, skb->csum, csum);
+					   &ip6h->saddr, &ip6h->daddr, nexthdr,
+					   desc->sn, skb->csum, csum);
 
 			skw_hex_dump("csum failed", skb->data, skb->len, false);
-
-		} else {
+		}
+		else
+		{
 			skb->ip_summed = CHECKSUM_UNNECESSARY;
 		}
 
@@ -238,29 +252,34 @@ static void skw_csum_verify(struct skw_rx_desc *desc, struct sk_buff *skb)
 	case htons(ETH_P_IP):
 		iph = (struct iphdr *)(skb->data);
 		tcphoff = iph->ihl * 4;
-		// tcph = (struct tcphdr *)(skb->data + tcphoff);
 
 		data_len = ntohs(iph->tot_len);
 
-		if (skb->len != data_len) {
+		if (skb->len != data_len)
+		{
 			skw_detail("ipv4 dummy pending: rx len: %d, tot_len: %d",
-				   skb->len, data_len);
+					   skb->len, data_len);
 
 			skb->csum = csum_partial(skb->data + tcphoff,
-					data_len - tcphoff, 0);
+									 data_len - tcphoff, 0);
 
 			skb_trim(skb, data_len);
 		}
 
 		csum = csum_tcpudp_magic(iph->saddr, iph->daddr,
-					data_len - tcphoff,
-					iph->protocol, skb->csum);
-		if (csum) {
+								 data_len - tcphoff,
+								 iph->protocol, skb->csum);
+		if (csum)
+		{
 			skw_detail("sa: %pI4, da: %pI4, proto: 0x%x, seq: %d, csum: 0x%x, result: 0x%x\n",
-				&iph->saddr, &iph->daddr, iph->protocol,
-				desc->sn, skb->csum, csum);
+					   &iph->saddr, &iph->daddr, iph->protocol,
+					   desc->sn, skb->csum, csum);
 
 			skw_hex_dump("csum failed", skb->data, skb->len, false);
+		}
+		else
+		{
+			skb->ip_summed = CHECKSUM_UNNECESSARY;
 		}
 
 		break;
