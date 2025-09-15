@@ -850,7 +850,11 @@ struct skw_iface *skw_add_iface(struct wiphy *wiphy, const char *name,
 	skw_add_vif(wiphy, iface);
 
 	if (ndev) {
-		skw_netdev_init(wiphy, ndev, addr);
+		ret = skw_netdev_init(wiphy, ndev, addr);
+		if (ret) {
+			skw_err("netdev init failed, ret: %d\n", ret);
+			goto iface_teardown;
+		}
 		ret = skw_register_netdevice(ndev);
 		if (ret) {
 			skw_err("register netdev failed\n");
