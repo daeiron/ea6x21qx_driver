@@ -23,7 +23,7 @@
 #include "skw_iface.h"
 
 #define SKW_CONNECT_TIMEOUT               msecs_to_jiffies(4000)
-#define SKW_STEP_TIMEOUT                  msecs_to_jiffies(500)
+#define SKW_STEP_TIMEOUT                  msecs_to_jiffies(1000)
 #define SKW_MAX_AUTH_ASSOC_RETRY_NUM      3
 #define SKW_MAX_SCAN_SSID                 4
 #define SKW_SCAN_TIMEOUT                  8000
