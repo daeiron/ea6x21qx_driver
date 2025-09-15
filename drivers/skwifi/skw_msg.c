@@ -206,6 +206,7 @@ static int skw_sta_rx_assoc(struct skw_iface *iface, int freq,
 		return 0;
 	}
 
+	mutex_lock(&core->lock);
 	skw_set_state(&core->sm, SKW_STATE_ASSOCED);
 
 	status_code = le16_to_cpu(mgmt->u.assoc_resp.status_code);
@@ -226,6 +227,7 @@ static int skw_sta_rx_assoc(struct skw_iface *iface, int freq,
 		iface->sta.report_deauth = false;
 		skw_set_state(&core->sm, SKW_STATE_NONE);
 	}
+	mutex_unlock(&core->lock);
 
 	skw_peer_ctx_unlock(ctx);
 
