@@ -3033,7 +3033,9 @@ static int skw_assoc(struct wiphy *wiphy, struct net_device *dev,
 		if (ether_addr_equal(core->bss.bssid, req->bss->bssid))
 			return 0;
 
+		mutex_lock(&core->lock);
 		skw_set_state(&core->sm, SKW_STATE_NONE);
+		mutex_unlock(&core->lock);
 
 		ret = skw_unjoin(wiphy, dev, core->bss.bssid, SKW_LEAVE, false);
 		if (ret)
@@ -3043,7 +3045,9 @@ static int skw_assoc(struct wiphy *wiphy, struct net_device *dev,
 		if (ret)
 			return ret;
 
+		mutex_lock(&core->lock);
 		skw_set_state(&core->sm, SKW_STATE_AUTHED);
+		mutex_unlock(&core->lock);
 
 		break;
 
