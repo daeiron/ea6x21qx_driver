@@ -3208,9 +3208,7 @@ int skw_connect_sae_auth(struct wiphy *wiphy, struct net_device *dev,
 		return ret;
 	}
 
-	mutex_lock(&iface->lock);
 	skw_set_state(&iface->sta.core.sm, SKW_STATE_AUTHING);
-	mutex_unlock(&iface->lock);
 
 	params.action = NL80211_EXTERNAL_AUTH_START;
 	memcpy(params.bssid, conn->bssid, ETH_ALEN);
@@ -3226,9 +3224,7 @@ int skw_connect_sae_auth(struct wiphy *wiphy, struct net_device *dev,
 		skw_err("failed, ret: %d\n", ret);
 
 		skw_unjoin(wiphy, dev, conn->bssid, SKW_LEAVE, false);
-		mutex_lock(&iface->lock);
 		skw_set_state(&iface->sta.core.sm, SKW_STATE_NONE);
-		mutex_unlock(&iface->lock);
 
 		cfg80211_connect_result(dev, conn->bssid, NULL, 0, NULL, 0,
 				WLAN_STATUS_UNSPECIFIED_FAILURE,
