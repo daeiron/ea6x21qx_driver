@@ -1210,7 +1210,7 @@ void skw_iface_set_wmm_capa(struct skw_iface *iface, const u8 *ies, size_t len)
 		case 3:
 			iface->wmm.ac[i].aci = SKW_WMM_AC_VO;
 			if (wmm->ac[aci].acm)
-				iface->wmm.acm |= BIT(SKW_WMM_AC_VI);
+				iface->wmm.acm |= BIT(SKW_WMM_AC_VO);
 
 			iface->wmm.factor[SKW_WMM_AC_VO] = (SKW_WMM_AC_VO - i) << 1;
 			break;
