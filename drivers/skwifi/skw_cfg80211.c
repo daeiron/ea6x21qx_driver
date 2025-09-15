@@ -4582,7 +4582,7 @@ static int skw_resume(struct wiphy *wiphy)
 	if (ret)
 		skw_warn("ret: %d\n", ret);
 
-	return 0;
+	return ret;
 }
 
 static void skw_set_wakeup(struct wiphy *wiphy, bool enabled)
