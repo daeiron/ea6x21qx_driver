@@ -96,8 +96,11 @@ static int skw_recovery_sta(struct wiphy *wiphy, struct skw_recovery_data *rd,
 			if (ret)
 				skw_warn("failed, sta: %pM, ret: %d\n",
 					 peer->addr, ret);
-
+			
+			mutex_lock(&core->lock);
 			skw_set_state(&core->sm, SKW_STATE_NONE);
+			mutex_unlock(&core->lock);
+			
 			memset(&core->bss, 0, sizeof(struct skw_bss_cfg));
 			core->bss.ctx_idx = SKW_INVALID_ID;
 
