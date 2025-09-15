@@ -402,100 +402,131 @@ static void skw_sta_work(struct work_struct *wk)
 
 	skw_wdev_lock(&iface->wdev);
 
+	mutex_lock(&core->lock);
 	if (time_after(jiffies, core->auth_start + SKW_CONNECT_TIMEOUT))
 		connect_failed = true;
 
-	switch (core->sm.state) {
+	switch (core->sm.state)
+	{
 	case SKW_STATE_AUTHED:
-		if (time_after(jiffies, core->pending.start + SKW_STEP_TIMEOUT)) {
+		if (time_after(jiffies, core->pending.start + SKW_STEP_TIMEOUT))
+		{
 			iface->sta.report_deauth = false;
 
+			mutex_unlock(&core->lock);
 			skw_sta_leave(wiphy, ndev, core->bss.bssid, 3, false);
 
 			if (iface->sta.sme_external)
 				skw_compat_auth_timeout(ndev, core->bss.bssid);
 			else
 				skw_disconnected(ndev, 3, true, GFP_KERNEL);
-		} else {
-			run_again = true;
 		}
-
+		else
+		{
+			run_again = true;
+			mutex_unlock(&core->lock);
+		}
 		break;
 
 	case SKW_STATE_AUTHING:
-		if (time_after(jiffies, core->pending.start + SKW_STEP_TIMEOUT)) {
-			if (++core->pending.retry >= SKW_MAX_AUTH_ASSOC_RETRY_NUM) {
+		if (time_after(jiffies, core->pending.start + SKW_STEP_TIMEOUT))
+		{
+			if (++core->pending.retry >= SKW_MAX_AUTH_ASSOC_RETRY_NUM)
+			{
 				connect_failed = true;
-			} else {
+			}
+			else
+			{
 				skw_set_state(&core->sm, SKW_STATE_AUTHING);
 
+				mutex_unlock(&core->lock);
 				if (skw_msg_xmit_timeout(wiphy,
-							 SKW_NDEV_ID(ndev),
-							 SKW_CMD_AUTH,
-							 core->pending.cmd,
-							 core->pending.cmd_len,
-							 NULL, 0, "SKW_CMD_AUTH",
-							 msecs_to_jiffies(300), 0))
+										 SKW_NDEV_ID(ndev),
+										 SKW_CMD_AUTH,
+										 core->pending.cmd,
+										 core->pending.cmd_len,
+										 NULL, 0, "SKW_CMD_AUTH",
+										 msecs_to_jiffies(300), 0))
 					connect_failed = true;
+				mutex_lock(&core->lock);
 			}
 		}
 
-		if (connect_failed) {
+		if (connect_failed)
+		{
 			iface->sta.report_deauth = false;
+			mutex_unlock(&core->lock);
 			skw_sta_leave(wiphy, ndev, core->bss.bssid, 3, false);
 
 			if (iface->sta.sme_external)
 				skw_compat_auth_timeout(ndev, core->bss.bssid);
 			else
 				skw_disconnected(ndev, 3, true, GFP_KERNEL);
-		} else {
-			run_again = true;
 		}
-
+		else
+		{
+			run_again = true;
+			mutex_unlock(&core->lock);
+		}
 		break;
 
 	case SKW_STATE_ASSOCING:
-		if (time_after(jiffies, core->pending.start + SKW_STEP_TIMEOUT)) {
-			if (++core->pending.retry >= SKW_MAX_AUTH_ASSOC_RETRY_NUM) {
+		if (time_after(jiffies, core->pending.start + SKW_STEP_TIMEOUT))
+		{
+			if (++core->pending.retry >= SKW_MAX_AUTH_ASSOC_RETRY_NUM)
+			{
 				connect_failed = true;
-			} else {
+			}
+			else
+			{
 				skw_set_state(&core->sm, SKW_STATE_ASSOCING);
 
+				mutex_unlock(&core->lock);
 				if (skw_msg_xmit_timeout(wiphy,
-							 SKW_NDEV_ID(ndev),
-							 SKW_CMD_ASSOC,
-							 core->pending.cmd,
-							 core->pending.cmd_len,
-							 NULL, 0, "SKW_CMD_ASSOC",
-							 msecs_to_jiffies(300), 0))
+										 SKW_NDEV_ID(ndev),
+										 SKW_CMD_ASSOC,
+										 core->pending.cmd,
+										 core->pending.cmd_len,
+										 NULL, 0, "SKW_CMD_ASSOC",
+										 msecs_to_jiffies(300), 0))
 					connect_failed = true;
+				mutex_lock(&core->lock);
 			}
 		}
 
-		if (connect_failed) {
+		if (connect_failed)
+		{
 			iface->sta.report_deauth = false;
+			mutex_unlock(&core->lock);
 			skw_sta_leave(wiphy, ndev, core->bss.bssid, 3, false);
 
 			if (iface->sta.sme_external)
 				skw_compat_assoc_timeout(ndev, core->cbss);
 			else
 				skw_disconnected(ndev, 3, true, GFP_KERNEL);
-		} else {
-			run_again = true;
 		}
-
+		else
+		{
+			run_again = true;
+			mutex_unlock(&core->lock);
+		}
 		break;
 
 	default:
+		mutex_unlock(&core->lock);
 		break;
 	}
 
 	skw_dbg("inst: %d, state: %s, connect failed: %d, run again: %d\n",
-		core->sm.inst, skw_state_name(core->sm.state),
-		connect_failed, run_again);
+			core->sm.inst, skw_state_name(core->sm.state),
+			connect_failed, run_again);
 
 	if (run_again)
+	{
+		mutex_lock(&core->lock);
 		skw_set_sta_timer(core, SKW_STEP_TIMEOUT);
+		mutex_unlock(&core->lock);
+	}
 
 	skw_wdev_unlock(&iface->wdev);
 }
