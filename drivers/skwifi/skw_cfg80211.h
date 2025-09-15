@@ -24,11 +24,11 @@
 
 #define SKW_CONNECT_TIMEOUT               msecs_to_jiffies(4000)
 #define SKW_STEP_TIMEOUT                  msecs_to_jiffies(1000)
-#define SKW_MAX_AUTH_ASSOC_RETRY_NUM      3
+#define SKW_MAX_AUTH_ASSOC_RETRY_NUM      5
 #define SKW_MAX_SCAN_SSID                 4
 #define SKW_SCAN_TIMEOUT                  8000
 #define SKW_CQM_SCAN_TIMEOUT              4
-#define SKW_MAX_STA_AUTH_ASSOC_RETRY      3
+#define SKW_MAX_STA_AUTH_ASSOC_RETRY      5
 #define SKW_EXTENDED_CAPA_LEN             11
 
 /* hostap mac acl mode */
