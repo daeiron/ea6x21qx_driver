@@ -1497,6 +1497,7 @@ int skw_tx_init(struct skw_core *skw)
 	if (ret < 0) {
 		SKW_KFREE(skw->eof_blk);
 		SKW_KFREE(skw->sdma_buff);
+		return ret;
 	}
 
 	tx_wait_time = SKW_TX_WAIT_TIME;
