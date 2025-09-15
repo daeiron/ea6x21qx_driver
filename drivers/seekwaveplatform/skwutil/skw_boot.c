@@ -581,13 +581,8 @@ static int seekwave_boot_probe(struct  platform_device *pdev)
 	ret = skw_first_boot(boot_data);
 	if (strncmp(dev->bus->name, "usb", 3))
 		skw_bind_boot_driver(io_bus);
-
-	//Start BT service from kernel
-	skw_start_bt_service();
-
 	return ret;
 }
-
 /***************************************************************************
  *Description:
  *Seekwave tech LTD
