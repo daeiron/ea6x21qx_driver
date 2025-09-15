@@ -2119,7 +2119,7 @@ static int skw_scan(struct wiphy *wiphy, struct cfg80211_scan_request *req)
 	return ret;
 }
 
-void skw_scan_done(struct skw_core *skw, struct skw_iface *iface, bool aborted)
+void skw_scan_done(struct skw_core *skw, struct skw_iface *iface, bool abort)
 {
 	struct cfg80211_scan_request *scan_req;
 
@@ -2132,19 +2132,19 @@ void skw_scan_done(struct skw_core *skw, struct skw_iface *iface, bool aborted)
 		goto ret;
 
 	skw_dbg("inst: %d, aborted: %d, scan result: %d\n",
-		iface->id, aborted, skw->nr_scan_results);
+		iface->id, abort, skw->nr_scan_results);
 
 	scan_req = skw->scan_req;
 	skw->scan_req = NULL;
 
 	skw_del_timer_work(skw, scan_req);
 
-	if (aborted) {
+	if (abort) {
 		skw_msg_xmit(priv_to_wiphy(skw), iface->id,
 			     SKW_CMD_STOP_SCAN, NULL, 0, NULL, 0);
 	}
 
-	skw_compat_scan_done(scan_req, aborted);
+	skw_compat_scan_done(scan_req, abort);
 
 ret:
 	mutex_unlock(&skw->lock);
