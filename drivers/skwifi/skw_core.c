@@ -685,7 +685,7 @@ static netdev_tx_t skw_ndo_xmit(struct sk_buff *skb, struct net_device *ndev)
 		break;
 	}
 
-	if (entry && is_completed)
+	if (entry && entry->peer && is_completed)
 		skw_setup_txba(skw, iface, entry->peer, tid);
 
 	rcu_read_unlock();
