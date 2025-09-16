@@ -561,20 +561,9 @@ static netdev_tx_t skw_ndo_xmit(struct sk_buff *skb, struct net_device *ndev)
 
 	case htons(ETH_P_IPV6):
 		prot = ipv6_hdr(skb)->nexthdr;
+		// fixme:
+		// get tcp/udp head offset
 		reset_l4_offset = ETH_HLEN + sizeof(struct ipv6hdr);
-		// Fix: Parse IPv6 extension headers to get TCP/UDP header offset
-		if (prot != IPPROTO_TCP && prot != IPPROTO_UDP)
-		{
-			u8 nexthdr = prot;
-			int offset = ipv6_skip_exthdr(skb, reset_l4_offset, &nexthdr, NULL);
-			if (offset < 0 || offset >= skb->len)
-			{
-				skw_dbg("invalid IPv6 extension headers, proto: 0x%x\n", prot);
-				goto free;
-			}
-			reset_l4_offset = offset;
-			prot = nexthdr; // Update protocol to TCP/UDP if applicable
-		}
 		break;
 
 	case htons(ETH_P_ARP):
@@ -631,31 +620,19 @@ static netdev_tx_t skw_ndo_xmit(struct sk_buff *skb, struct net_device *ndev)
 	if (!do_csum && (prot == IPPROTO_UDP || prot == IPPROTO_TCP))
 		skb_set_transport_header(skb, reset_l4_offset);
 
-	// Fix: Disable checksum for fragmented TCP/UDP frames
-	switch (prot)
-	{
+	// fixme:
+	/* enable checksum for TCP & UDP frame, except framgment frame */
+	switch (prot) {
 	case IPPROTO_UDP:
 		is_udp_filter = skw_udp_filter(ndev, skb);
 		if (udp_hdr(skb)->check == 0)
 			do_csum = 0;
-		// Check for IPv4/IPv6 fragmentation
-		else if ((eth->h_proto == htons(ETH_P_IP) && ip_hdr(skb)->frag_off != 0) ||
-				 (eth->h_proto == htons(ETH_P_IPV6) && prot == IPPROTO_FRAGMENT))
-		{
-			do_csum = 0;
-			skw_dbg("disable csum for fragmented UDP frame\n");
-		}
+
 		break;
 
 	case IPPROTO_TCP:
 		tcp_pkt = 1;
-		// Check for IPv4/IPv6 fragmentation
-		if ((eth->h_proto == htons(ETH_P_IP) && ip_hdr(skb)->frag_off != 0) ||
-			(eth->h_proto == htons(ETH_P_IPV6) && ipv6_hdr(skb)->nexthdr == IPPROTO_FRAGMENT))
-		{
-			do_csum = 0;
-			skw_dbg("disable csum for fragmented TCP frame\n");
-		}
+
 		break;
 
 	default:
