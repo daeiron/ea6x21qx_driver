@@ -5,9 +5,9 @@ SKW_EXTRA_SYMBOLS := $(SKW_SRC_ROOT)/drivers/seekwaveplatform/Module.symvers
 ARCH := arm64
 KERNEL_SRC := $(HOME)/coreelec/CoreELEC/build.CoreELEC-Amlogic-no.aarch64-22/build/linux-2c3e329b7dec94edae5e9fb5f33669239c384436
 
-.PHONY: all skw_wifi skw_bsp modules_install clean
+.PHONY: all skw_wifi skw_bsp skw_bt modules_install clean
 
-all: skw_bsp skw_wifi
+all: skw_bsp skw_wifi skw_bt
 	@echo "seekwave modules build complete"
 
 skw_wifi: skw_bsp
@@ -21,19 +21,29 @@ skw_wifi: skw_bsp
 skw_bsp:
 	$(MAKE) INSTALL_MOD_STRIP=1 ARCH=$(ARCH) -C $(KERNEL_SRC) \
 		M=$(PWD)/drivers/seekwaveplatform modules \
-		CONFIG_SKW_SDIOHAL=m CONFIG_SEEKWAVE_BSP_DRIVERS=m CONFIG_SKW_BSP_UCOM=m CONFIG_SKW_BSP_BOOT=m \
+		CONFIG_SKW_SDIOHAL=m CONFIG_SEEKWAVE_BSP_DRIVERS=m CONFIG_SKW_BSP_UCOM=m CONFIG_SKW_BSP_BOOT=m CONFIG_SKW_BT=m \
 		LLVM=1 \
 		skw_extra_flags="-I$(SKW_EXTRA_INC) -I$(SKW_SRC_ROOT)/drivers/skwifi -include $(SKW_EXTRA_INC)/skw6160_config.h" \
+		skw_extra_symbols=$(SKW_EXTRA_SYMBOLS)
+
+skw_bt: skw_bsp
+	$(MAKE) INSTALL_MOD_STRIP=1 ARCH=$(ARCH) -C $(KERNEL_SRC) \
+		M=$(PWD)/drivers/swtbt4l modules \
+		CONFIG_SKW_BT=m \
+		LLVM=1 \
+		skw_extra_flags="-I$(SKW_EXTRA_INC) -include $(SKW_EXTRA_INC)/skw6160_config.h" \
 		skw_extra_symbols=$(SKW_EXTRA_SYMBOLS)
 
 modules_install: all
 	mkdir -p $(SKW_SRC_ROOT)/modules/
 	find $(SKW_SRC_ROOT)/drivers/seekwaveplatform -name "*.ko" -exec cp {} $(SKW_SRC_ROOT)/modules/ \;
 	find $(SKW_SRC_ROOT)/drivers/skwifi -name "*.ko" -exec cp {} $(SKW_SRC_ROOT)/modules/ \;
+	find $(SKW_SRC_ROOT)/drivers/swtbt4l -name "*.ko" -exec cp {} $(SKW_SRC_ROOT)/modules/ \;
 
 
 clean:
 	$(MAKE) -C $(KERNEL_SRC) M=$(SKW_SRC_ROOT)/drivers/skwifi clean
 	$(MAKE) -C $(KERNEL_SRC) M=$(SKW_SRC_ROOT)/drivers/seekwaveplatform clean
+	$(MAKE) -C $(KERNEL_SRC) M=$(SKW_SRC_ROOT)/drivers/swtbt4l clean
 	rm -rf $(SKW_SRC_ROOT)/modules
 	@echo "seekwave modules cleaned"
